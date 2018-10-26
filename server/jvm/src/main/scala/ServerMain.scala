@@ -3,11 +3,21 @@ import com.twitter.finagle.http.Response
 import com.twitter.util.Await
 import io.finch.syntax._
 import io.finch._
+import io.finch.circe._
+import io.circe.generic.auto._
 
 object ServerMain extends App with StaticResourceSupport {
 
   val index: Endpoint[Response] = get("index") {
     getResource("index.html", "text/html")
+  }
+
+  val selection: Endpoint[Boolean] = post("selection") {
+    Ok(true)
+  }
+
+  val games: Endpoint[List[Game]] = get("games") {
+    Ok(List(Game(Team("Vikings"), Team("Ravens")), Game(Team("Vikings"), Team("Ravens"))))
   }
 
   def httpGetResource(resource: String, contentType: String) = get(resource) {
@@ -23,14 +33,11 @@ object ServerMain extends App with StaticResourceSupport {
       httpGetResource("mode-json.js", "application/javascript") :+:
       httpGetResource("worker-json.js", "application/javascript") :+:
       httpGetResource("locks-ui.js", "application/javascript") :+:
-      httpGetResource("locks-ui.js.map", "application/json") :+:
-      get("index") {
-        getResource("index.html", "text/html")
-      }
+      httpGetResource("locks-ui.js.map", "application/json")
   }
 
   try {
-    Await.ready(Http.server.serve(":8081", resources.toServiceAs[Text.Html]))
+    Await.ready(Http.server.serve(":8081", (index :+: resources :+: games :+: selection).toServiceAs[Application.Json]))
   } catch {
     case e: Exception => println(e.getLocalizedMessage)
   }

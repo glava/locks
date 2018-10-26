@@ -1,9 +1,10 @@
+import sbt.Keys.libraryDependencies
 import sbt.url
 
 name := "locks"
 
 version := "0.1"
-
+val circeV = "0.10.0"
 val scalaV = "2.12.6"
 val slf4jV = "1.7.25"
 val logbackV = "1.2.3"
@@ -22,7 +23,12 @@ lazy val common = Seq(name := "locks-common",
 lazy val core = crossProject.in(file("core"))
   .settings(common)
   .settings(Seq(
-    name := "locks-core"
+    name := "locks-core",
+    libraryDependencies ++= Seq(
+      "io.circe" %%% "circe-core",
+      "io.circe" %%% "circe-generic",
+      "io.circe" %%% "circe-parser"
+    ).map(_ % circeV)
   ))
 
 lazy val coreJVM = core.jvm
@@ -54,7 +60,7 @@ lazy val serverJVM = server.jvm.settings(
     val classDir = (classDirectory in Compile).value
     IO.copyFile(jsFile, classDir / jsFile.getName)
   }
-)
+).dependsOn(coreJVM)
 
 val updateUi = taskKey[Unit]("copy ui resources to class dir")
 
