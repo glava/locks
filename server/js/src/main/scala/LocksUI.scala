@@ -1,13 +1,13 @@
 import com.thoughtworks.binding.Binding.Var
-import com.thoughtworks.binding.{Binding, dom}
+import com.thoughtworks.binding.{ Binding, dom }
 import org.scalajs.dom.html.Div
 import org.scalajs.dom.window
 import pages.DomView
-import pages.Page.{Routing, page}
+import pages.Page.{ Routing, page }
 import ui._
 import io.circe._
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
 
 object LocksUI extends App with Layout {
 
@@ -35,7 +35,7 @@ object LocksUI extends App with Layout {
     case _ =>
   })
   val routes: Routing[Binding[Div]] =
-    page[Binding[Div]]("/flows", _ => {
+    page[Binding[Div]]("/games", _ => {
       println("hello")
       new GamesComponent(new LocksApiClient())
     }).otherwise(_ => new EmptyComponent())

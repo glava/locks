@@ -33,7 +33,13 @@ object ServerMain extends App with StaticResourceSupport {
       httpGetResource("mode-json.js", "application/javascript") :+:
       httpGetResource("worker-json.js", "application/javascript") :+:
       httpGetResource("locks-ui.js", "application/javascript") :+:
-      httpGetResource("locks-ui.js.map", "application/json")
+      httpGetResource("locks-ui.js.map", "application/json") :+:
+      httpGetResource("toastr.min.css", "text/css") :+:
+      httpGetResource("bootstrap.min.css", "text/css") :+:
+      httpGetResource("bootswatch.lumen.min.css", "text/css") :+:
+      httpGetResource("fontawesome-all.css", "text/css") :+:
+      httpGetResource("style.css", "text/css") :+:
+      httpGetResource("style.css", "text/css")
   }
 
   try {
