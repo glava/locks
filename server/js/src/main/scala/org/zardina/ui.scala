@@ -1,3 +1,5 @@
+package org.zardina
+
 import com.thoughtworks.binding.Binding
 import org.scalajs.dom.html.Div
 

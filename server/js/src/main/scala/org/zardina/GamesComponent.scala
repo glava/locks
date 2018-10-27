@@ -1,10 +1,12 @@
-import com.thoughtworks.binding.Binding.{ Var, Vars }
-import com.thoughtworks.binding.{ Binding, dom }
+package org.zardina
+
+import com.thoughtworks.binding.Binding.Vars
+import com.thoughtworks.binding.{Binding, dom}
 import org.scalajs.dom.Event
 import org.scalajs.dom.html.Div
-import ui._
+import org.zardina.ui.HtmlComponent
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class GamesComponent(apiClient: LocksApiClient) extends HtmlComponent with Layout {
 

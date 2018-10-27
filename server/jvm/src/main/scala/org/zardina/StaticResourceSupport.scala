@@ -1,8 +1,10 @@
+package org.zardina
+
 import java.util.concurrent.TimeUnit
 
-import com.twitter.finagle.http.{ Response, Status }
-import com.twitter.io.{ Buf, Reader }
-import com.twitter.util.{ Duration, Future }
+import com.twitter.finagle.http.{Response, Status}
+import com.twitter.io.{Buf, Reader}
+import com.twitter.util.{Duration, Future}
 
 import scala.util.Try
 

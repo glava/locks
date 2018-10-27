@@ -1,10 +1,10 @@
+package org.zardina
+
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
 import com.twitter.util.Await
-import io.finch.syntax._
-import io.finch._
-import io.finch.circe._
-import io.circe.generic.auto._
+import io.finch.syntax.{get, post}
+import io.finch.{Application, Endpoint, Ok}
 
 object ServerMain extends App with StaticResourceSupport {
 
