@@ -1,6 +1,6 @@
 package org.zardina
 
-import com.thoughtworks.binding.{Binding, dom}
+import com.thoughtworks.binding.{ Binding, dom }
 import org.scalajs.dom.html.Div
 
 trait Layout {

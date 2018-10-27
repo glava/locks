@@ -1,11 +1,10 @@
 package org.zardina
 
-
 import io.circe.generic.auto._
 import io.circe.parser._
 import org.scalajs.dom.ext.Ajax
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 class LocksApiClient(implicit ex: ExecutionContext) {
 

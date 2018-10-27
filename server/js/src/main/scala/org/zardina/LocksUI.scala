@@ -1,14 +1,14 @@
 package org.zardina
 
 import com.thoughtworks.binding.Binding.Var
-import com.thoughtworks.binding.{Binding, dom}
+import com.thoughtworks.binding.{ Binding, dom }
 import org.scalajs.dom.html.Div
 import org.scalajs.dom.window
 import org.zardina.ui.HtmlComponent
 import pages.DomView
-import pages.Page.{Routing, page}
+import pages.Page.{ Routing, page }
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
 
 object LocksUI extends App with Layout {
 
