@@ -60,7 +60,7 @@ lazy val serverJVM = server.jvm.settings(
     val classDir = (classDirectory in Compile).value
     IO.copyFile(jsFile, classDir / jsFile.getName)
   }
-).dependsOn(coreJVM)
+).dependsOn(coreJVM, slick)
 
 val updateUi = taskKey[Unit]("copy ui resources to class dir")
 
