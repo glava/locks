@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd"
+        logicalFilePath="crate_team.xml">
+
+    <changeSet id="1" author="locker">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="_TEAM" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="_TEAM">
+            <column name="_ID" type="varchar(40)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="_NAME" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_NUM_OF_WINS" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_NUM_OF_LOSES" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_NUM_OF_DRAWS" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_CREATED" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_UPDATED" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
