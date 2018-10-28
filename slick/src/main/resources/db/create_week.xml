@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd"
+        logicalFilePath="crate_week.xml">
+
+    <changeSet id="1" author="locker">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="_WEEK" />
+            </not>
+        </preConditions>
+
+        <createTable tableName="_WEEK">
+            <column name="_ID" type="varchar(40)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="_WEEK_NUMBER" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_HOME_TEAM_ID" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_AWAY_TEAM_ID" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_RESULT" type="varchar(40)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="_CREATED" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_UPDATED" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

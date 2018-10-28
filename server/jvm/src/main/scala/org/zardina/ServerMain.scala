@@ -3,10 +3,13 @@ package org.zardina
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
 import com.twitter.util.Await
-import io.finch.syntax.{get, post}
-import io.finch.{Application, Endpoint, Ok}
+import io.finch.syntax.{ get, post }
+import io.finch.{ Application, Endpoint, Ok }
+import slick.jdbc.{ DriverDataSource, H2Profile }
 
 object ServerMain extends App with StaticResourceSupport {
+
+  DbMigration.updateDatabase(DataSource.mysqlConnection)
 
   val index: Endpoint[Response] = get("index") {
     getResource("index.html", "text/html")
@@ -43,7 +46,7 @@ object ServerMain extends App with StaticResourceSupport {
   }
 
   try {
-    Await.ready(Http.server.serve(":8081", (index :+: resources :+: games :+: selection).toServiceAs[Application.Json]))
+    Await.ready(Http.server.serve(":8081", (index :+: resources).toServiceAs[Application.Json]))
   } catch {
     case e: Exception => println(e.getLocalizedMessage)
   }
