@@ -9,4 +9,5 @@
     <include file="db/create_user.xml" />
     <include file="db/create_team.xml" />
     <include file="db/create_week.xml" />
+    <include file="db/create_game.xml" />
 </databaseChangeLog>
