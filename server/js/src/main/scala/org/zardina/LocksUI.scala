@@ -39,7 +39,9 @@ object LocksUI extends App with Layout {
     page[Binding[Div]]("/games", _ => {
       println("hello")
       new GamesComponent(new LocksApiClient())
-    }).otherwise(_ => new EmptyComponent())
+    })
+      .page("/top", _ => { new TopComponent(new LocksApiClient()) })
+      .otherwise(_ => new EmptyComponent())
 
   com.thoughtworks.binding.dom.render(window.document.getElementById("locks-app"), appView)
 

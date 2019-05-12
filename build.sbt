@@ -9,6 +9,8 @@ val scalaV = "2.12.6"
 val slf4jV = "1.7.25"
 val logbackV = "1.2.3"
 val finchV = "0.25.0"
+val sangriaVersion = "1.4.2"
+val sangriaCirceVersion = "1.2.1"
 cancelable in Global := true
 
 scalacOptions += "-P:scalajs:sjsDefinedByDefault"
@@ -52,6 +54,9 @@ lazy val serverJVM = server.jvm.settings(
   libraryDependencies ++= Seq(
     "com.github.finagle" %% "finch-core" % finchV,
     "com.github.finagle" %% "finch-circe" % finchV,
+    "org.sangria-graphql" %% "sangria" % sangriaVersion,
+    "org.sangria-graphql" %% "sangria-relay" % sangriaVersion,
+    "org.sangria-graphql" %% "sangria-circe" % sangriaCirceVersion,
     "ch.qos.logback" % "logback-classic" % logbackV,
     "org.eclipse.jgit" % "org.eclipse.jgit" % "4.9.0.201710071750-r"
   ),

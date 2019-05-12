@@ -10,7 +10,9 @@ class LocksApiClient(implicit ex: ExecutionContext) {
 
   def games(): Future[List[Game]] = {
     Ajax.get("/games").flatMap(response => decode[List[Game]](response.responseText) match {
-      case Left(r) => Future.failed(r)
+      case Left(r) =>
+        println(r)
+        Future.failed(r)
       case Right(r) =>
         println(r)
         Future.successful(r)
@@ -19,7 +21,9 @@ class LocksApiClient(implicit ex: ExecutionContext) {
 
   def selection(): Future[Boolean] = {
     Ajax.post("/selection").flatMap(response => decode[Boolean](response.responseText) match {
-      case Left(r) => Future.failed(r)
+      case Left(r) =>
+        println(r)
+        Future.failed(r)
       case Right(r) =>
         println(r)
         Future.successful(r)
