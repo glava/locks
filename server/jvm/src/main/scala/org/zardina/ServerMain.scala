@@ -1,16 +1,12 @@
 package org.zardina
-import sangria.schema._
 
-import sangria.macros.derive._
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
-import com.twitter.util.{ Await, Future }
+import com.twitter.util.{ Await }
 import io.finch.syntax.{ get, post }
 import org.zardina.graphql._
 import com.twitter.finagle.http.Status
-import io.circe.generic.auto._
-import io.circe._, io.circe.generic.semiauto._
-import sangria.marshalling.circe._
+
 import scala.concurrent.ExecutionContext
 import io.circe._
 import io.finch.{ Endpoint, _ }
