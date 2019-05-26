@@ -2,6 +2,8 @@ package org.zardina.repository
 import java.util.UUID
 
 import javax.sql.DataSource
+import org.zardina
+import org.zardina.User
 import slick.jdbc.JdbcProfile
 import slick.util.AsyncExecutor
 import slick.lifted.{ AbstractTable, CanBeQueryCondition, Query }
@@ -33,7 +35,11 @@ class SlickUserRepository(dataSource: DataSource)(implicit val profile: JdbcProf
 
   private val userTable = TableQuery[User]
 
-  override def createUser(nick: String, email: String): Future[Int] = {
-    db.run(userTable += SlickUser(UUID.randomUUID().toString, nick, email, 1L, 1L)).map { x => x }
+  override def createUser(nick: String, email: String): Future[org.zardina.User] = {
+    db.run(userTable += SlickUser(UUID.randomUUID().toString, nick, email, 1L, 1L))
+      .map { x => org.zardina.User(email, nick) }
   }
+
+  override def getUser(email: String): Future[Option[zardina.User]] = Future.successful(Some(User("gogo", "gogo_nick")))
+
 }

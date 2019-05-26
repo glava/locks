@@ -1,15 +1,21 @@
 package org.zardina
+import sangria.schema._
 
+import sangria.macros.derive._
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
 import com.twitter.util.{ Await, Future }
 import io.finch.syntax.{ get, post }
-import io.finch.{ Endpoint, Ok }
 import org.zardina.graphql._
 import com.twitter.finagle.http.Status
-
+import io.circe.generic.auto._
+import io.circe._, io.circe.generic.semiauto._
+import sangria.marshalling.circe._
 import scala.concurrent.ExecutionContext
-
+import io.circe._
+import io.finch.{ Endpoint, _ }
+import org.zardina.repository.{ GameRepository, SlickGameRepository, SlickTeamRepository, SlickUserRepository, SlickWeekRepository, TeamRepository, UserRepository, WeekRepository }
+import slick.jdbc.H2Profile
 object ServerMain extends App
   with StaticResourceSupport
   with GraphQlRequestDecoders
@@ -17,97 +23,35 @@ object ServerMain extends App
 
   DbMigration.updateDatabase(DataSource.mysqlConnection)
 
-  case class Picture(width: Int, height: Int, url: Option[String])
+  val apiContext: ApiContext = new ApiContext {
+    implicit val profile = H2Profile
+    implicit val context = ExecutionContext.global
 
-  import sangria.schema._
-
-  import sangria.macros.derive._
-
-  implicit val PictureType = deriveObjectType[Unit, Picture](
-    ObjectTypeDescription("The product picture"),
-    DocumentField("url", "Picture CDN URL"))
-
-  trait Identifiable {
-    def id: String
+    override val gameRepository: GameRepository = new SlickGameRepository(DataSource.mysqlConnection)
+    override val teamRepository: TeamRepository = new SlickTeamRepository(DataSource.mysqlConnection)
+    override val userRepository: UserRepository = new SlickUserRepository(DataSource.mysqlConnection)
+    override val weekRepository: WeekRepository = new SlickWeekRepository(DataSource.mysqlConnection)
   }
 
-  val IdentifiableType = InterfaceType(
-    "Identifiable",
-    "Entity that can be identified",
-
-    fields[Unit, Identifiable](
-      Field("id", StringType, resolve = _.value.id)))
-
-  case class Product(id: String, name: String, description: String) extends Identifiable {
-    def picture(size: Int): Picture =
-      Picture(width = size, height = size, url = Some(s"//cdn.com/$size/$id.jpg"))
-  }
-
-  val ProductType = deriveObjectType[Unit, Product](
-    Interfaces(IdentifiableType),
-    IncludeMethods("picture"))
-
-  class ProductRepo {
-    private val Products = List(
-      Product("1", "Cheesecake", "Tasty"),
-      Product("2", "Health Potion", "+50 HP"))
-
-    def product(id: String): Option[Product] =
-      Products find (_.id == id)
-
-    def products: List[Product] = Products
-  }
-
-  val Id = Argument("id", StringType)
-
-  val QueryType = ObjectType("Query", fields[ProductRepo, Unit](
-    Field("product", OptionType(ProductType),
-      description = Some("Returns a product with specific `id`."),
-      arguments = Id :: Nil,
-      resolve = c ⇒ c.ctx.product(c arg Id)),
-
-    Field("products", ListType(ProductType),
-      description = Some("Returns a list of all available products."),
-      resolve = _.ctx.products)))
-
-  val schema = Schema(QueryType)
+  val executor = GraphQlQueryExecutor.executor(SangriaSchema.schema, apiContext, maxQueryDepth = 10)
 
   val index: Endpoint[Response] = get("index") {
     getResource("index.html", "text/html")
   }
 
-  import io.circe._
-
-  import io.finch.{ Endpoint, _ }
-
-  val executor = GraphQlQueryExecutor.executor(schema, new ProductRepo, maxQueryDepth = 10)
-
-  def api: Endpoint[Json] =
+  val api: Endpoint[Json] =
     post("api" :: jsonBody[GraphQlQuery]) { query: GraphQlQuery =>
-      executeQuery(query)
+      val result = executor.execute(query)(ExecutionContext.global)
+
+      // Do our best to map the type of error back to a HTTP status code
+      result.map {
+        case SuccessfulGraphQlResult(json, _) => Output.payload(json, Status.Ok)
+        case ClientErrorGraphQlResult(json, _, _) => Output.payload(json, Status.BadRequest)
+        case BackendErrorGraphQlResult(json, _, _) => Output.payload(json, Status.InternalServerError)
+      }
     }
 
-  private def executeQuery(query: GraphQlQuery): Future[Output[Json]] = {
-    val operationName = query.operationName.getOrElse("unnamed_operation")
-    runQuery(query)
-  }
-
-  private def runQuery(query: GraphQlQuery): Future[Output[Json]] = {
-    val result = executor.execute(query)(ExecutionContext.global)
-    import io.circe._, io.circe.generic.semiauto._
-    // Do our best to map the type of error back to a HTTP status code
-    result.map {
-      case SuccessfulGraphQlResult(json, _) => Output.payload(json, Status.Ok)
-      case ClientErrorGraphQlResult(json, _, _) => Output.payload(json, Status.BadRequest)
-      case BackendErrorGraphQlResult(json, _, _) => Output.payload(json, Status.InternalServerError)
-    }
-  }
-
-  val games: Endpoint[List[Game]] = get("games") {
-    Ok(List(Game(Team("Vikings"), Team("Ravens")), Game(Team("Vikings"), Team("Ravens"))))
-  }
-
-  def httpGetResource(resource: String, contentType: String) = get(resource) {
+  def httpGetResource(resource: String, contentType: String): Endpoint[Response] = get(resource) {
     getResource(resource, contentType)
   }
 
@@ -138,7 +82,7 @@ object ServerMain extends App
   }
 
   try {
-    Await.ready(Http.server.serve(":8081", (index :+:   resources :+: api).toService))
+    Await.ready(Http.server.serve(":8081", (index :+: resources :+: api).toService))
   } catch {
     case e: Exception => println(e.getLocalizedMessage)
   }
