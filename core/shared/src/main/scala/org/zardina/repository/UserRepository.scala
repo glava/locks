@@ -6,7 +6,7 @@ import scala.concurrent.Future
 
 trait UserRepository {
 
-  def createUser(nick: String, email: String): Future[User]
+  def createUser(nick: String, email: String, password: String): Future[User]
 
   def getUser(email: String): Future[Option[User]]
 

@@ -21,7 +21,7 @@ object SangriaSchema {
     Field("user", OptionType(UserType),
       description = Some("Returns a user with specific `id`."),
       arguments = Email :: Nil,
-      resolve = c ⇒ c.ctx.userRepository.getUser(c arg Email)),
+      resolve = c ⇒ c.ctx.getUser(c arg Email)),
   ))
 
 
@@ -34,6 +34,7 @@ object SangriaSchema {
 
 
   val NameArg = Argument("name", StringType)
+  val PasswordArg = Argument("password", StringType)
   val AuthProviderArg = Argument("authProvider", AuthProviderSignupDataInputType)
 
   val Mutation = ObjectType(
@@ -41,8 +42,8 @@ object SangriaSchema {
     fields[ApiContext, Unit](
       Field("createUser",
         UserType,
-        arguments = NameArg :: AuthProviderArg :: Nil,
-        resolve = c => c.ctx.userRepository.createUser(c.arg(NameArg), c.arg(AuthProviderArg).email.email)
+        arguments = NameArg :: PasswordArg :: Email :: Nil,
+        resolve = c => c.ctx.addUser(c.arg(NameArg), c.arg(Email), c.arg(PasswordArg))
       )
     )
   )

@@ -17,16 +17,16 @@ object ServerMain extends App
   with GraphQlRequestDecoders
   with GraphQlEncoders {
 
-  DbMigration.updateDatabase(DataSource.mysqlConnection)
+  DbMigration.updateDatabase(DataSource.h2Connection)
 
   val apiContext: ApiContext = new ApiContext {
     implicit val profile = H2Profile
     implicit val context = ExecutionContext.global
 
-    override val gameRepository: GameRepository = new SlickGameRepository(DataSource.mysqlConnection)
-    override val teamRepository: TeamRepository = new SlickTeamRepository(DataSource.mysqlConnection)
-    override val userRepository: UserRepository = new SlickUserRepository(DataSource.mysqlConnection)
-    override val weekRepository: WeekRepository = new SlickWeekRepository(DataSource.mysqlConnection)
+    override val gameRepository: GameRepository = new SlickGameRepository(DataSource.h2Connection)
+    override val teamRepository: TeamRepository = new SlickTeamRepository(DataSource.h2Connection)
+    override val userRepository: UserRepository = new SlickUserRepository(DataSource.h2Connection)
+    override val weekRepository: WeekRepository = new SlickWeekRepository(DataSource.h2Connection)
   }
 
   val executor = GraphQlQueryExecutor.executor(SangriaSchema.schema, apiContext, maxQueryDepth = 10)
