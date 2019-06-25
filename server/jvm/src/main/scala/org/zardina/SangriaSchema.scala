@@ -1,53 +1,51 @@
 package org.zardina
-import sangria.marshalling.circe._
 import io.circe.generic.auto._
-import sangria.macros.derive.{DocumentField, InputObjectTypeName, ObjectTypeDescription, deriveInputObjectType, deriveObjectType}
-import sangria.schema.{Argument, Field, InputObjectType, ObjectType, OptionType, Schema, StringType, fields}
+import sangria.macros.derive.GraphQLField
+import sangria.marshalling.circe._
+import sangria.schema.{ Argument, Schema, StringType }
+
+import scala.concurrent.Future
 
 object SangriaSchema {
-
+  import sangria.macros.derive._
   case class AuthProviderEmail(email: String, password: String)
   case class AuthProviderSignupData(email: AuthProviderEmail)
 
   implicit val UserType = deriveObjectType[Unit, User](
     ObjectTypeDescription("User of the lock"),
     DocumentField("email", "email of the user"),
-    DocumentField("nick", "nick of the user")
-  )
+    DocumentField("nick", "nick of the user"))
 
-  val Email = Argument("email", StringType)
+  implicit val WeekType = deriveObjectType[Unit, Week](
+    ObjectTypeDescription("User of the lock"),
+    DocumentField("home", "email of the user"),
+    DocumentField("away", "nick of the user"),
+    DocumentField("week", "nick of the user"))
 
-  val QueryType = ObjectType("Query", fields[ApiContext, Unit](
-    Field("user", OptionType(UserType),
-      description = Some("Returns a user with specific `id`."),
-      arguments = Email :: Nil,
-      resolve = c ⇒ c.ctx.getUser(c arg Email)),
-  ))
+  val EmailArg = Argument("email", StringType)
+  val IdArg = Argument("id", StringType)
 
+  trait ApiQueryContext {
 
+    @GraphQLField
+    def getGames(week: Int): Future[Seq[org.zardina.Week]]
 
-  implicit val AuthProviderEmailInputType: InputObjectType[AuthProviderEmail] = deriveInputObjectType[AuthProviderEmail](
-    InputObjectTypeName("AUTH_PROVIDER_EMAIL")
-  )
+    @GraphQLField
+    def getUser(email: String): Future[Option[org.zardina.User]]
+  }
 
-  lazy val AuthProviderSignupDataInputType: InputObjectType[AuthProviderSignupData] = deriveInputObjectType[AuthProviderSignupData]()
+  trait ApiMutationContext {
+    @GraphQLField
+    def addUser(name: String, email: String, password: String): Future[org.zardina.User]
 
+    @GraphQLField
+    def updateGames: Future[List[Int]]
+  }
 
-  val NameArg = Argument("name", StringType)
-  val PasswordArg = Argument("password", StringType)
-  val AuthProviderArg = Argument("authProvider", AuthProviderSignupDataInputType)
+  trait ApiContext extends ApiQueryContext with ApiMutationContext
 
-  val Mutation = ObjectType(
-    "Mutation",
-    fields[ApiContext, Unit](
-      Field("createUser",
-        UserType,
-        arguments = NameArg :: PasswordArg :: Email :: Nil,
-        resolve = c => c.ctx.addUser(c.arg(NameArg), c.arg(Email), c.arg(PasswordArg))
-      )
-    )
-  )
+  val MutationType = deriveContextObjectType[ApiContext, ApiMutationContext, Unit](identity)
+  val QueryType = deriveContextObjectType[ApiContext, ApiQueryContext, Unit](identity)
 
-
-  val schema = Schema(QueryType, mutation = Some(Mutation))
+  val schema = Schema(QueryType, mutation = Some(MutationType))
 }

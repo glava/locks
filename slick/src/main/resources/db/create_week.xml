@@ -16,18 +16,24 @@
 
         <createTable tableName="_WEEK">
             <column name="_ID" type="varchar(40)">
-                <constraints primaryKey="true" nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="_WEEK_NUMBER" type="int">
-                <constraints nullable="false"/>
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="_HOME_TEAM_ID" type="varchar(40)">
-                <constraints nullable="false"/>
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="_AWAY_TEAM_ID" type="varchar(40)">
-                <constraints nullable="false"/>
+            <column name="_VISITOR_TEAM_ID" type="varchar(40)">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="_RESULT" type="varchar(40)">
+            <column name="_HOME_TEAM_WIN" type="boolean">
+                <constraints nullable="true"/>
+            </column>
+            <column name="_HOME_TEAM_POINTS" type="double">
+                <constraints nullable="true"/>
+            </column>
+            <column name="_VISITOR_TEAM_POINTS" type="double">
                 <constraints nullable="true"/>
             </column>
             <column name="_CREATED" type="bigint">

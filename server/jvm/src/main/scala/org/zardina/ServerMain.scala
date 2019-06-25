@@ -2,7 +2,7 @@ package org.zardina
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
-import com.twitter.util.{ Await }
+import com.twitter.util.Await
 import io.finch.syntax.{ get, post }
 import org.zardina.graphql._
 import com.twitter.finagle.http.Status
@@ -10,16 +10,19 @@ import com.twitter.finagle.http.Status
 import scala.concurrent.ExecutionContext
 import io.circe._
 import io.finch.{ Endpoint, _ }
-import org.zardina.repository.{ GameRepository, SlickGameRepository, SlickTeamRepository, SlickUserRepository, SlickWeekRepository, TeamRepository, UserRepository, WeekRepository }
+import org.zardina.repository._
 import slick.jdbc.H2Profile
+
 object ServerMain extends App
   with StaticResourceSupport
   with GraphQlRequestDecoders
   with GraphQlEncoders {
+  implicit val profile = H2Profile
+  implicit val context = ExecutionContext.global
 
   DbMigration.updateDatabase(DataSource.h2Connection)
 
-  val apiContext: ApiContext = new ApiContext {
+  lazy val apiContext: ApiContextImplementation = new ApiContextImplementation {
     implicit val profile = H2Profile
     implicit val context = ExecutionContext.global
 
