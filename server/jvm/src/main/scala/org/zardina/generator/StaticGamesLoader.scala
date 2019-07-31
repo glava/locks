@@ -12,7 +12,7 @@ trait StaticGamesLoader {
 
   def staticGameDetails = decode[List[GameDetailsInstance]](json).right.get
 
-  lazy val json = Source.fromResource("season.json").getLines().mkString("\n")
+  def json = Source.fromResource("season.json").getLines().mkString("\n")
 
   case class GameDetailsInstance(gameDate: String, homeTeamAbbr: String, visitorTeamAbbr: String, week: Int)
 

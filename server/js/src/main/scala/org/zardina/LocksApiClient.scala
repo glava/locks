@@ -1,23 +1,52 @@
 package org.zardina
 
+import io.circe.{ Decoder, Json }
 import io.circe.generic.auto._
 import io.circe.parser._
-import org.scalajs.dom.ext.Ajax
+import org.scalajs.dom.ext.{ Ajax, AjaxException }
 
 import scala.concurrent.{ ExecutionContext, Future }
 
+case class GraphQLResponse[T](data: T)
+case class GamesList(games: List[Games])
+case class Games(home: String, away: String, week: String)
+
 class LocksApiClient(implicit ex: ExecutionContext) {
 
-  def games(): Future[List[Game]] = {
-    Ajax.get("/games").flatMap(response => decode[List[Game]](response.responseText) match {
-      case Left(r) =>
-        println(r)
-        Future.failed(r)
-      case Right(r) =>
-        println(r)
-        Future.successful(r)
+  def query[T](query: String, variables: Map[String, Json] = Map.empty)(implicit ev: Decoder[T]): Future[GraphQLResponse[T]] = {
+    val queryJson = Json.obj(
+      "query" -> Json.fromString(query),
+      "variables" -> Json.fromFields(variables)).noSpaces
+
+    Ajax.post("/api", queryJson, headers = Map("Content-Type" -> "application/json")).flatMap(response => decode[GraphQLResponse[T]](response.responseText) match {
+      case Right(parsed) =>
+        Future.successful(parsed)
+      case Left(error) =>
+        println(s"error while process api query: ${error.getMessage}, ${response.responseText}, ${response.status}, ${response.statusText}")
+        error.printStackTrace()
+        Future.failed(error)
+    }).transform(identity[GraphQLResponse[T]], error => error match {
+      case ajax: AjaxException =>
+        val errorResponse: Json = decode[Json](ajax.xhr.responseText).toOption.flatMap(_.asObject).get("error").getOrElse(Json.fromString(error.getMessage))
+        println(errorResponse)
+        new RuntimeException(errorResponse.asString.getOrElse(""))
+      case error: Throwable => new RuntimeException(error.getMessage)
     })
   }
+
+  def games(): Future[List[Game]] = {
+    Future.successful(List.empty)
+  }
+
+  def getGames(week: Int): Future[GamesList] =
+    query[GamesList](
+      s"""
+         |query {
+         |  getGames (week: ${week})
+         |  {home, away, week  }
+         |}
+         |
+       """.stripMargin).map(_.data)
 
   def selection(): Future[Boolean] = {
     Ajax.post("/selection").flatMap(response => decode[Boolean](response.responseText) match {
