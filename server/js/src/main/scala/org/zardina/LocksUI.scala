@@ -37,9 +37,10 @@ object LocksUI extends App with Layout {
   })
   val routes: Routing[Binding[Div]] =
     page[Binding[Div]]("/games", _ => {
-      println("hello")
-      new GamesComponent(new LocksApiClient())
-    }).otherwise(_ => new EmptyComponent())
+      new GamesComponent(new GamesCircuitTrait(new LocksApiClient()))
+    })
+      //.page("/top", _ => { new TopComponent(new LocksApiClient()) })
+      .otherwise(_ => new GamesComponent(new GamesCircuitTrait(new LocksApiClient())))
 
   com.thoughtworks.binding.dom.render(window.document.getElementById("locks-app"), appView)
 

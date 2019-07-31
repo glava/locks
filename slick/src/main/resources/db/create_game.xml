@@ -24,7 +24,10 @@
             <column name="_WEEK_ID" type="varchar(40)">
                 <constraints nullable="false"/>
             </column>
-            <column name="_LOCKED_TEAM_ID" type="varchar(40)">
+            <column name="_LOCKED_WEEK_GAME_ID" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_HOME_TEAM_SELECTED" type="boolean">
                 <constraints nullable="false"/>
             </column>
             <column name="_POINTS" type="double">

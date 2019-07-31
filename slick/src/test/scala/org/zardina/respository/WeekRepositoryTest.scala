@@ -13,7 +13,7 @@ class WeekRepositoryTest extends FlatSpec with SlickSpec with Matchers with Scal
   lazy val weekRepository = new SlickWeekRepository(dataSource)(H2Profile, ExecutionContext.global)
 
   "WeekRepository" should "be able to create a week" in {
-    weekRepository.createWeek("CAR", "AR", 1).futureValue should be(1)
+    weekRepository.createGame("CAR", "AR", 1).futureValue should be(1)
   }
 
 }

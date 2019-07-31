@@ -24,6 +24,9 @@
             <column name="_NICK" type="varchar(40)">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
+            <column name="_PASSWORD" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
             <column name="_CREATED" type="bigint">
                 <constraints nullable="false"/>
             </column>

@@ -4,31 +4,62 @@ import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
 import com.twitter.util.Await
 import io.finch.syntax.{ get, post }
-import io.finch.{ Application, Endpoint, Ok }
-import slick.jdbc.{ DriverDataSource, H2Profile }
+import org.zardina.graphql._
+import com.twitter.finagle.http.Status
 
-object ServerMain extends App with StaticResourceSupport {
+import scala.concurrent.ExecutionContext
+import io.circe._
+import io.finch.{ Endpoint, _ }
+import org.zardina.repository._
+import slick.jdbc.H2Profile
 
-  DbMigration.updateDatabase(DataSource.mysqlConnection)
+object ServerMain extends App
+  with StaticResourceSupport
+  with GraphQlRequestDecoders
+  with GraphQlEncoders {
+  implicit val profile = H2Profile
+  implicit val context = ExecutionContext.global
+
+  DbMigration.updateDatabase(DataSource.h2Connection)
+
+  lazy val apiContext: ApiContextImplementation = new ApiContextImplementation {
+    implicit val profile = H2Profile
+    implicit val context = ExecutionContext.global
+
+    override val gameRepository: GameRepository = new SlickGameRepository(DataSource.h2Connection)
+    override val teamRepository: TeamRepository = new SlickTeamRepository(DataSource.h2Connection)
+    override val userRepository: UserRepository = new SlickUserRepository(DataSource.h2Connection)
+    override val weekRepository: WeekRepository = new SlickWeekRepository(DataSource.h2Connection)
+  }
+
+  val executor = GraphQlQueryExecutor.executor(SangriaSchema.schema, apiContext, maxQueryDepth = 10)
 
   val index: Endpoint[Response] = get("index") {
     getResource("index.html", "text/html")
   }
 
-  val selection: Endpoint[Boolean] = post("selection") {
-    Ok(true)
-  }
+  val api: Endpoint[Json] =
+    post("api" :: jsonBody[GraphQlQuery]) { query: GraphQlQuery =>
+      val result = executor.execute(query)(ExecutionContext.global)
 
-  val games: Endpoint[List[Game]] = get("games") {
-    Ok(List(Game(Team("Vikings"), Team("Ravens")), Game(Team("Vikings"), Team("Ravens"))))
-  }
+      // Do our best to map the type of error back to a HTTP status code
+      result.map {
+        case SuccessfulGraphQlResult(json, _) => Output.payload(json, Status.Ok)
+        case ClientErrorGraphQlResult(json, _, _) => Output.payload(json, Status.BadRequest)
+        case BackendErrorGraphQlResult(json, _, _) => Output.payload(json, Status.InternalServerError)
+      }
+    }
 
-  def httpGetResource(resource: String, contentType: String) = get(resource) {
+  def httpGetResource(resource: String, contentType: String): Endpoint[Response] = get(resource) {
     getResource(resource, contentType)
   }
 
   val resources = {
     httpGetResource("jquery.min.js", "application/javascript") :+:
+      httpGetResource("react.min.js", "application/javascript") :+:
+      httpGetResource("fetch.min.js", "application/javascript") :+:
+      httpGetResource("react-dom.min.js", "application/javascript") :+:
+      httpGetResource("es6-promise.auto.min.js", "application/javascript") :+:
       httpGetResource("bootstrap.min.js", "application/javascript") :+:
       httpGetResource("toastr.min.js", "application/javascript") :+:
       httpGetResource("ace.js", "application/javascript") :+:
@@ -42,11 +73,15 @@ object ServerMain extends App with StaticResourceSupport {
       httpGetResource("bootswatch.lumen.min.css", "text/css") :+:
       httpGetResource("fontawesome-all.css", "text/css") :+:
       httpGetResource("style.css", "text/css") :+:
-      httpGetResource("style.css", "text/css")
+      httpGetResource("style.css", "text/css") :+:
+      httpGetResource("graphiql.html", "text/html") :+:
+      httpGetResource("index.html", "text/html") :+:
+      httpGetResource("graphiql.min.css", "text/css") :+:
+      httpGetResource("graphiql.min.js", "application/javascript")
   }
 
   try {
-    Await.ready(Http.server.serve(":8081", (index :+: resources).toServiceAs[Application.Json]))
+    Await.ready(Http.server.serve(":8081", (index :+: resources :+: api).toService))
   } catch {
     case e: Exception => println(e.getLocalizedMessage)
   }
