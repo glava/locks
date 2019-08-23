@@ -5,7 +5,7 @@
         xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd"
-        logicalFilePath="crate_game.xml">
+        logicalFilePath="crate_week.xml">
 
     <changeSet id="1" author="locker">
         <preConditions onFail="MARK_RAN">
@@ -16,21 +16,24 @@
 
         <createTable tableName="_GAME">
             <column name="_ID" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_WEEK_NUMBER" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="_USER_ID" type="int">
-                <constraints nullable="false"/>
+            <column name="_HOME_TEAM_ID" type="varchar(40)">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="_WEEK_ID" type="varchar(40)">
-                <constraints nullable="false"/>
+            <column name="_VISITOR_TEAM_ID" type="varchar(40)">
+                <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="_LOCKED_WEEK_GAME_ID" type="varchar(40)">
-                <constraints nullable="false"/>
+            <column name="_HOME_TEAM_WIN" type="boolean">
+                <constraints nullable="true"/>
             </column>
-            <column name="_HOME_TEAM_SELECTED" type="boolean">
-                <constraints nullable="false"/>
+            <column name="_HOME_TEAM_POINTS" type="double">
+                <constraints nullable="true"/>
             </column>
-            <column name="_POINTS" type="double">
+            <column name="_VISITOR_TEAM_POINTS" type="double">
                 <constraints nullable="true"/>
             </column>
             <column name="_CREATED" type="bigint">

@@ -13,7 +13,7 @@ class UserRepositoryTest extends FlatSpec with SlickSpec with Matchers with Scal
   lazy val userRepository = new SlickUserRepository(dataSource)(H2Profile, ExecutionContext.global)
 
   "UserRepository" should "be able to create an user" in {
-    userRepository.createUser("gogo_botafogo", "gogili@golo.com", "avaala").futureValue should be(1)
+    userRepository.createUser("gogo_botafogo", "gogili@golo.com", "avaala").futureValue.email should be("gogili@golo.com")
   }
 
 }

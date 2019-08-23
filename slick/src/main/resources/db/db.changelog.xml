@@ -8,6 +8,6 @@
         logicalFilePath="db.changelog.xml">
     <include file="db/create_user.xml" />
     <include file="db/create_team.xml" />
-    <include file="db/create_week.xml" />
     <include file="db/create_game.xml" />
+    <include file="db/create_lock.xml" />
 </databaseChangeLog>

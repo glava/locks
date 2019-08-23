@@ -26,10 +26,10 @@ object ServerMain extends App
     implicit val profile = H2Profile
     implicit val context = ExecutionContext.global
 
-    override val gameRepository: GameRepository = new SlickGameRepository(DataSource.h2Connection)
+    override val lockRepository: LockRepository = new SlickLockRepository(DataSource.h2Connection)
     override val teamRepository: TeamRepository = new SlickTeamRepository(DataSource.h2Connection)
     override val userRepository: UserRepository = new SlickUserRepository(DataSource.h2Connection)
-    override val weekRepository: WeekRepository = new SlickWeekRepository(DataSource.h2Connection)
+    override val gameRepository: GameRepository = new SlickGameRepository(DataSource.h2Connection)
   }
 
   val executor = GraphQlQueryExecutor.executor(SangriaSchema.schema, apiContext, maxQueryDepth = 10)

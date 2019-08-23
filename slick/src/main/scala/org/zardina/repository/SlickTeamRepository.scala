@@ -1,11 +1,11 @@
 package org.zardina.repository
 
 import javax.sql.DataSource
-import org.zardina.{Team, repository}
+import org.zardina.{ Team, repository }
 import slick.jdbc.JdbcProfile
 import slick.util.AsyncExecutor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ ExecutionContext, Future }
 
 case class SlickTeam(
   id: String,
@@ -41,7 +41,7 @@ class SlickTeamRepository(dataSource: DataSource)(implicit val profile: JdbcProf
   }
 }
 
-object SlickTeam {
+object AllTeams {
   val teams: Seq[Team] = Seq(
     ("Arizona Cardinals", "ARI"),
     ("Chicago Bears", "CHI"),
@@ -74,8 +74,7 @@ object SlickTeam {
     ("Carolina Panthers", "CAR"),
     ("Jacksonville Jaguars", "JAX"),
     ("Baltimore Ravens", "BAL"),
-    ("Houston Texans", "HOU")
-  ).map {
-    case (name, id) => repository.SlickTeam(id, name, 0, 0, 0, 1L, 2L)
-  }
+    ("Houston Texans", "HOU")).map {
+      case (name, id) => repository.SlickTeam(id, name, 0, 0, 0, 1L, 2L)
+    }
 }

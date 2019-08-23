@@ -1,3 +1,3 @@
 package org.zardina
 
-case class Game(homeTeam: Team, awayTeam: Team)
+case class Game(home: String, away: String, week: Int)

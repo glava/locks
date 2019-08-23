@@ -2,8 +2,6 @@ package org.zardina
 
 object Teams {
 
-
-
 }
 
 trait Team {

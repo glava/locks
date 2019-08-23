@@ -16,7 +16,7 @@ object SangriaSchema {
     DocumentField("email", "email of the user"),
     DocumentField("nick", "nick of the user"))
 
-  implicit val WeekType = deriveObjectType[Unit, Week](
+  implicit val GameType = deriveObjectType[Unit, Game](
     ObjectTypeDescription("User of the lock"),
     DocumentField("home", "email of the user"),
     DocumentField("away", "nick of the user"),
@@ -28,7 +28,7 @@ object SangriaSchema {
   trait ApiQueryContext {
 
     @GraphQLField
-    def getGames(week: Int): Future[Seq[org.zardina.Week]]
+    def getGames(week: Int): Future[Seq[org.zardina.Game]]
 
     @GraphQLField
     def getUser(email: String): Future[Option[org.zardina.User]]
@@ -39,7 +39,7 @@ object SangriaSchema {
     def addUser(name: String, email: String, password: String): Future[org.zardina.User]
 
     @GraphQLField
-    def updateGames: Future[List[Int]]
+    def loadGames: Future[List[Int]]
   }
 
   trait ApiContext extends ApiQueryContext with ApiMutationContext

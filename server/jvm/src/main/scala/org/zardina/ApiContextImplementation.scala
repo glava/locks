@@ -1,17 +1,17 @@
 package org.zardina
 
 import org.zardina.generator.StaticGamesLoader
-import org.zardina.repository.{ GameRepository, TeamRepository, UserRepository, WeekRepository }
+import org.zardina.repository.{ LockRepository, TeamRepository, UserRepository, GameRepository }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGamesLoader {
 
-  val gameRepository: GameRepository
+  val lockRepository: LockRepository
   val teamRepository: TeamRepository
   val userRepository: UserRepository
-  val weekRepository: WeekRepository
+  val gameRepository: GameRepository
 
   def addUser(nick: String, email: String, password: String): Future[User] = {
     userRepository.createUser(nick, email, password)
@@ -21,13 +21,13 @@ trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGames
     userRepository.getUser(email)
   }
 
-  def getGames(week: Int): Future[Seq[Week]] = {
-    weekRepository.getGames(week.toString)
+  def getGames(week: Int): Future[Seq[Game]] = {
+    gameRepository.getGames(week.toString)
   }
 
-  def updateGames: Future[List[Int]] = {
+  def loadGames: Future[List[Int]] = {
     Future.sequence(staticGameDetails.map { g =>
-      weekRepository.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
+      gameRepository.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
     })
   }
 }
