@@ -13,9 +13,7 @@ class TopComponent(apiClient: LocksApiClient) extends HtmlComponent with Layout 
   val instances: Vars[Game] = Vars.empty
 
   override def init: Unit = {
-    apiClient.games().onComplete { games =>
-      instances.value ++= games.getOrElse(List.empty)
-    }(ExecutionContext.global)
+
   }
 
   def fillTemplate(isHomeSelected: Boolean): Future[Boolean] = {

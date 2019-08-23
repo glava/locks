@@ -28,7 +28,7 @@ object SangriaSchema {
   trait ApiQueryContext {
 
     @GraphQLField
-    def getGames(week: Int): Future[Seq[org.zardina.Game]]
+    def games(week: Int): Future[Seq[org.zardina.Game]]
 
     @GraphQLField
     def getUser(email: String): Future[Option[org.zardina.User]]

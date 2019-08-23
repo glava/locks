@@ -10,10 +10,10 @@ import org.zardina.ui.HtmlComponent
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class FoundInstances(instances: Seq[Games]) extends Action
+case class FoundInstances(instances: Seq[Game]) extends Action
 case class LoadWeek(id: Int) extends Action
 
-final case class InstancesModel(instances: Seq[Games])
+final case class InstancesModel(instances: Seq[Game])
 
 class GamesCircuitTrait(api: LocksApiClient)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
   override protected def initialModel: InstancesModel = InstancesModel(Seq.empty)
@@ -22,7 +22,7 @@ class GamesCircuitTrait(api: LocksApiClient)(implicit ex: ExecutionContext) exte
     case (model: InstancesModel, action) =>
       action match {
         case LoadWeek(gameWeek) =>
-          val loadInstances = Effect(api.getGames(gameWeek).map(list => FoundInstances(list.games)))
+          val loadInstances = Effect(api.games(gameWeek).map(response => FoundInstances(response.games)))
           Some(EffectOnly(loadInstances))
 
         case FoundInstances(newInstances) =>
@@ -38,7 +38,7 @@ class GamesCircuitTrait(api: LocksApiClient)(implicit ex: ExecutionContext) exte
 
 class GamesComponent(circuit: GamesCircuitTrait) extends HtmlComponent with Layout {
 
-  val instances: Vars[Games] = Vars.empty
+  val instances: Vars[Game] = Vars.empty
 
   override def init: Unit = {
     circuit.subscribe(circuit.zoom(identity)) { model =>
@@ -61,12 +61,12 @@ class GamesComponent(circuit: GamesCircuitTrait) extends HtmlComponent with Layo
           <tr>
             <td>
               { contact.home }
-              <button class="btn btn-default" onclick={ (_: Event) => fillTemplate(true) }>Bla</button>
+              <button class="btn btn-default" onclick={ (_: Event) => fillTemplate(true) }>Lock away</button>
             </td>
             -
             <td>
               { contact.away }
-              <button class="btn btn-default" onclick={ (_: Event) => fillTemplate(false) }>Blac</button>
+              <button class="btn btn-default" onclick={ (_: Event) => fillTemplate(false) }>Lock home</button>
             </td>
           </tr>
         }

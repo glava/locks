@@ -21,7 +21,7 @@ trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGames
     userRepository.getUser(email)
   }
 
-  def getGames(week: Int): Future[Seq[Game]] = {
+  def games(week: Int): Future[Seq[Game]] = {
     gameRepository.getGames(week.toString)
   }
 
