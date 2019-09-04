@@ -22,6 +22,9 @@ object SangriaSchema {
     DocumentField("away", "nick of the user"),
     DocumentField("week", "nick of the user"))
 
+  implicit val TeamType = deriveObjectType[Unit, Team](
+    ObjectTypeDescription("NFL Team"))
+
   val EmailArg = Argument("email", StringType)
   val IdArg = Argument("id", StringType)
 
@@ -32,6 +35,9 @@ object SangriaSchema {
 
     @GraphQLField
     def getUser(email: String): Future[Option[org.zardina.User]]
+
+    @GraphQLField
+    def team(acronym: String): Future[Team]
   }
 
   trait ApiMutationContext {
@@ -40,6 +46,10 @@ object SangriaSchema {
 
     @GraphQLField
     def loadGames: Future[List[Int]]
+
+    @GraphQLField
+    def createLock(week: Int, gameId: String, homeTeamSelected: Boolean, userId: String): Future[Int]
+
   }
 
   trait ApiContext extends ApiQueryContext with ApiMutationContext

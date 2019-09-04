@@ -1,15 +1,10 @@
 package org.zardina
 
-object Teams {
-
-}
-
-trait Team {
-  val id: String
-  val name: String
-  val numOfWins: Int
-  val numOfLoses: Int
-  val numOfDraws: Int
-  val created: Long
-  val updated: Long
-}
+case class Team(
+  name: String,
+  acronym: String,
+  numOfWins: Int,
+  numOfLoses: Int,
+  numOfDraws: Int,
+  created: Long,
+  updated: Long)
