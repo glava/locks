@@ -9,6 +9,7 @@ import scala.concurrent.{ ExecutionContext, Future }
 
 case class GraphQLResponse[T](data: T)
 case class GamesList(games: List[Game])
+case class LockResult(createLock: Lock)
 
 class LocksApiClient(implicit ex: ExecutionContext) {
 
@@ -16,9 +17,10 @@ class LocksApiClient(implicit ex: ExecutionContext) {
     val queryJson = Json.obj(
       "query" -> Json.fromString(query),
       "variables" -> Json.fromFields(variables)).noSpaces
-
+    println(queryJson)
     Ajax.post("/api", queryJson, headers = Map("Content-Type" -> "application/json")).flatMap(response => decode[GraphQLResponse[T]](response.responseText) match {
       case Right(parsed) =>
+        println(parsed)
         Future.successful(parsed)
       case Left(error) =>
         println(s"error while process api query: ${error.getMessage}, ${response.responseText}, ${response.status}, ${response.statusText}")
@@ -26,6 +28,7 @@ class LocksApiClient(implicit ex: ExecutionContext) {
         Future.failed(error)
     }).transform(identity[GraphQLResponse[T]], error => error match {
       case ajax: AjaxException =>
+        println(ajax)
         val errorResponse: Json = decode[Json](ajax.xhr.responseText).toOption.flatMap(_.asObject).get("error").getOrElse(Json.fromString(error.getMessage))
         println(errorResponse)
         new RuntimeException(errorResponse.asString.getOrElse(""))
@@ -33,12 +36,22 @@ class LocksApiClient(implicit ex: ExecutionContext) {
     })
   }
 
+  def createLock(gameId: String, homeTeamSelected: Boolean, userId: String): Future[LockResult] =
+    query[LockResult](
+      s"""
+         |mutation {
+         |  createLock (gameId: ${gameId}, homeTeamSelected: ${homeTeamSelected}, userId: ${userId})
+         |  { userId, weekId, points  }
+         |}
+         |
+       """.stripMargin).map(_.data)
+
   def games(week: Int): Future[GamesList] =
     query[GamesList](
       s"""
          |query {
          |  games (week: ${week})
-         |  { home, away, week  }
+         |  { id, home, away, week  }
          |}
          |
        """.stripMargin).map(_.data)
