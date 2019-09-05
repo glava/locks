@@ -35,7 +35,10 @@ trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGames
     } ++ AllTeams.teams.map { case (name, acronym) => teamRepository.createTeam(name, acronym) })
   }
 
-  def createLock(week: Int, gameId: String, homeTeamSelected: Boolean, userId: String) = {
-    Future.successful(1)
+  def createLock(gameId: String, homeTeamSelected: Boolean, userId: String): Future[Lock] = {
+    for {
+      game <- gameRepository.getGame(gameId)
+      lock <- lockRepository.createLock(userId, gameId, if (homeTeamSelected) { game.home } else { game.away }, 1)
+    } yield lock
   }
 }

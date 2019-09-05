@@ -25,6 +25,9 @@ object SangriaSchema {
   implicit val TeamType = deriveObjectType[Unit, Team](
     ObjectTypeDescription("NFL Team"))
 
+  implicit val LockType = deriveObjectType[Unit, Lock](
+    ObjectTypeDescription("This is what we play for"))
+
   val EmailArg = Argument("email", StringType)
   val IdArg = Argument("id", StringType)
 
@@ -48,7 +51,7 @@ object SangriaSchema {
     def loadGames: Future[List[Int]]
 
     @GraphQLField
-    def createLock(week: Int, gameId: String, homeTeamSelected: Boolean, userId: String): Future[Int]
+    def createLock(gameId: String, homeTeamSelected: Boolean, userId: String): Future[Lock]
 
   }
 

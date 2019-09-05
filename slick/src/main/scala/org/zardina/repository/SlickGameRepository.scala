@@ -4,6 +4,7 @@ import java.util.UUID
 
 import javax.sql.DataSource
 import org.zardina
+import org.zardina.Team
 import slick.jdbc.JdbcProfile
 import slick.util.AsyncExecutor
 
@@ -52,10 +53,24 @@ class SlickGameRepository(dataSource: DataSource)(implicit val profile: JdbcProf
     db.run(table += SlickGame(UUID.randomUUID().toString, homeTeam, visitorTeam, weekNumber, 1l, 1l))
   }
 
+  override def getGame(home: String, away: String, week: Int): Future[zardina.Game] = {
+    db.run(table.filter(_.homeTeamId === home).filter(_.awayTeamId === away).filter(_.weekNumber === week).result.headOption).flatMap {
+      case Some(p) => Future.successful(zardina.Game(p.id, p.homeTeamId, p.visitorTeamId, p.weekNumber))
+      case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
+    }
+  }
+
+  override def getGame(id: String): Future[zardina.Game] = {
+    db.run(table.filter(_.id === id).result.headOption).flatMap {
+      case Some(p) => Future.successful(zardina.Game(p.id, p.homeTeamId, p.visitorTeamId, p.weekNumber))
+      case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
+    }
+  }
+
   override def getGames(week: String): Future[Seq[zardina.Game]] = {
     db.run(table.filter(_.weekNumber === week.toInt).result).map {
-      _.map { p =>
-        zardina.Game(p.homeTeamId, p.visitorTeamId, p.weekNumber)
+      _.map { slickGame =>
+        zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, slickGame.weekNumber)
       }
     }
   }
