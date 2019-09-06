@@ -40,8 +40,9 @@ class LocksApiClient(implicit ex: ExecutionContext) {
     query[LockResult](
       s"""
          |mutation {
-         |  createLock (gameId: ${gameId}, homeTeamSelected: ${homeTeamSelected}, userId: ${userId})
-         |  { userId, weekId, points  }
+         |createLock(gameId: "${gameId}", homeTeamSelected: ${homeTeamSelected}, userId:"${userId}") {
+         |userId, gameId, lockedTeam, points
+         |}
          |}
          |
        """.stripMargin).map(_.data)
