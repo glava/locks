@@ -13,7 +13,7 @@ import scala.concurrent.{ Await, ExecutionContext, Future }
 case class SlickLock(
   id: String,
   userId: String,
-  weekId: String,
+  gameId: String,
   lockedTeam: String,
   points: Double,
   created: Long,
@@ -168,5 +168,12 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
 
   override def createLock(userId: String, gameId: String, lockedTeamId: String, points: Double): Future[org.zardina.Lock] = {
     db.run(Locks += SlickLock(UUID.randomUUID().toString, userId, gameId, lockedTeamId, points, 1l, 2L)).map(_ => org.zardina.Lock(userId, gameId, lockedTeamId, points))
+  }
+
+  override def getLocks(userId: String, weekId: String): Future[Seq[zardina.Lock]] = {
+    val innerJoin = for {
+      (lock, _) <- Locks.filter(_.userId === userId) join Games.filter(_.weekNumber === weekId.toInt) on (_.gameId === _.id)
+    } yield lock
+    db.run(innerJoin.result.map(_.map { lock => org.zardina.Lock(lock.userId, lock.gameId, lock.lockedTeam, lock.points) }))
   }
 }
