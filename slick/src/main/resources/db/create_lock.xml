@@ -37,6 +37,36 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="_USER_ID"
+                                 baseTableName="_LOCK"
+                                 constraintName="_USER_ID_FK"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="_ID"
+                                 referencedTableName="_USER"/>
+
+        <addForeignKeyConstraint baseColumnNames="_GAME_ID"
+                                 baseTableName="_LOCK"
+                                 constraintName="_GAME_ID_FK"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="_ID"
+                                 referencedTableName="_GAME"/>
+
+        <addForeignKeyConstraint baseColumnNames="_LOCKED_TEAM"
+                                 baseTableName="_LOCK"
+                                 constraintName="_LOCKED_TEAM_FK"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="CASCADE"
+                                 onUpdate="RESTRICT"
+                                 referencedColumnNames="_ID"
+                                 referencedTableName="_TEAM"/>
     </changeSet>
 
 </databaseChangeLog>

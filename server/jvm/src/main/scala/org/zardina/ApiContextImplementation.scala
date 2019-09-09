@@ -8,37 +8,34 @@ import scala.concurrent.Future
 
 trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGamesLoader {
 
-  val lockRepository: LockRepository
-  val teamRepository: TeamRepository
-  val userRepository: UserRepository
-  val gameRepository: GameRepository
+  val dao: LockRepository with GameRepository with UserRepository with TeamRepository
 
   def addUser(nick: String, email: String, password: String): Future[User] = {
-    userRepository.createUser(nick, email, password)
+    dao.createUser(nick, email, password)
   }
 
   def getUser(email: String): Future[Option[User]] = {
-    userRepository.getUser(email)
+    dao.getUser(email)
   }
 
   def games(week: Int): Future[Seq[Game]] = {
-    gameRepository.getGames(week.toString)
+    dao.getGames(week.toString)
   }
 
   def team(acronym: String): Future[Team] = {
-    teamRepository.team(acronym)
+    dao.team(acronym)
   }
 
-  def loadGames: Future[List[Int]] = {
+  def loadGames = {
     Future.sequence(staticGameDetails.map { g =>
-      gameRepository.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
-    } ++ AllTeams.teams.map { case (name, acronym) => teamRepository.createTeam(name, acronym) })
+      dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
+    })
   }
 
   def createLock(gameId: String, homeTeamSelected: Boolean, userId: String): Future[Lock] = {
     for {
-      game <- gameRepository.getGame(gameId)
-      lock <- lockRepository.createLock(userId, gameId, if (homeTeamSelected) { game.home } else { game.away }, 1)
+      game <- dao.getGame(gameId)
+      lock <- dao.createLock(userId, gameId, if (homeTeamSelected) { game.home } else { game.away }, 1)
     } yield lock
   }
 }

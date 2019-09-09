@@ -48,7 +48,7 @@ object SangriaSchema {
     def addUser(name: String, email: String, password: String): Future[org.zardina.User]
 
     @GraphQLField
-    def loadGames: Future[List[Int]]
+    def loadGames: Future[List[org.zardina.Game]]
 
     @GraphQLField
     def createLock(gameId: String, homeTeamSelected: Boolean, userId: String): Future[Lock]

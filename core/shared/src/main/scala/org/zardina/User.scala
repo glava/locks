@@ -1,3 +1,3 @@
 package org.zardina
 
-case class User(email: String, nick: String)
+case class User(id: String, email: String, nick: String)
