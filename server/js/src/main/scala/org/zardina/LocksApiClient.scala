@@ -8,7 +8,7 @@ import org.scalajs.dom.ext.{ Ajax, AjaxException }
 import scala.concurrent.{ ExecutionContext, Future }
 
 case class GraphQLResponse[T](data: T)
-case class GamesList(games: List[Game])
+case class GamesList(games: List[Game], getUser: User)
 case class LockResult(createLock: Lock)
 
 class LocksApiClient(implicit ex: ExecutionContext) {
@@ -52,7 +52,9 @@ class LocksApiClient(implicit ex: ExecutionContext) {
       s"""
          |query {
          |  games (week: ${week})
-         |  { id, home, away, week  }
+         |  { id, home, away, week  },
+         |  getUser(email:"gogo")
+         |  { id, email, nick }
          |}
          |
        """.stripMargin).map(_.data)
