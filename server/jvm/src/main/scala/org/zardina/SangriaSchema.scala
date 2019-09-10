@@ -37,10 +37,14 @@ object SangriaSchema {
     def games(week: Int): Future[Seq[org.zardina.Game]]
 
     @GraphQLField
-    def getUser(email: String): Future[Option[org.zardina.User]]
+    def user(email: String): Future[Option[org.zardina.User]]
 
     @GraphQLField
     def team(acronym: String): Future[Team]
+
+    @GraphQLField
+    def locks(userId: String, week: Int): Future[Seq[Lock]]
+
   }
 
   trait ApiMutationContext {

@@ -14,16 +14,20 @@ trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGames
     dao.createUser(nick, email, password)
   }
 
-  def getUser(email: String): Future[Option[User]] = {
+  def user(email: String): Future[Option[User]] = {
     dao.getUser(email)
   }
 
   def games(week: Int): Future[Seq[Game]] = {
-    dao.getGames(week.toString)
+    dao.getGames(week)
   }
 
   def team(acronym: String): Future[Team] = {
     dao.team(acronym)
+  }
+
+  override def locks(userId: String, week: Int): Future[Seq[Lock]] = {
+    dao.locks(userId, week)
   }
 
   def loadGames = {

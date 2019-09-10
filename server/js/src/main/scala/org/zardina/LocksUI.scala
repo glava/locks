@@ -8,7 +8,7 @@ import org.zardina.ui.HtmlComponent
 import pages.DomView
 import pages.Page.{ Routing, page }
 
-import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
+import scala.concurrent.{ Await, ExecutionContext, ExecutionContextExecutor }
 
 object LocksUI extends App with Layout {
 
@@ -37,10 +37,10 @@ object LocksUI extends App with Layout {
   })
   val routes: Routing[Binding[Div]] =
     page[Binding[Div]]("/games", _ => {
-      new GamesComponent(new GamesCircuitTrait(new LocksApiClient()))
+      new GamesComponent(new GamesCircuit(new LocksApiClient()))
     })
       //.page("/top", _ => { new TopComponent(new LocksApiClient()) })
-      .otherwise(_ => new GamesComponent(new GamesCircuitTrait(new LocksApiClient())))
+      .otherwise(_ => new GamesComponent(new GamesCircuit(new LocksApiClient())))
 
   com.thoughtworks.binding.dom.render(window.document.getElementById("locks-app"), appView)
 

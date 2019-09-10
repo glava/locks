@@ -19,7 +19,7 @@ class LockRepositoryTest extends FlatSpec with SlickSpec with Matchers with Scal
     val game = lockRepository.createGame("CAR", "AR", 1).futureValue
     lockRepository.createLock(user.id, game.id, "CAR", 10.0).futureValue
 
-    lockRepository.getLocks(user.id, "1").futureValue.head should be(Lock(user.id, game.id, "CAR", 10.0))
+    lockRepository.locks(user.id, 1).futureValue.head should be(Lock(user.id, game.id, "CAR", 10.0))
   }
 
 }

@@ -10,7 +10,7 @@ import org.zardina.ui.HtmlComponent
 
 import scala.concurrent.{ ExecutionContext, Future }
 
-case class GamesLoaded(games: Seq[Game], user: User) extends Action
+case class GamesLoaded(games: Seq[Game], locks: Seq[Lock], user: User) extends Action
 case class LoadGames(id: Int) extends Action
 case class LockItUp(gameId: String, userId: String, isHomeSelected: Boolean) extends Action
 case class LockItUpResult(lock: Lock) extends Action
@@ -19,14 +19,19 @@ final case class InstancesModel(instances: Seq[GameProjection], user: Option[Use
 
 case class GameProjection(game: Game, lock: Option[Lock])
 
-class GamesCircuitTrait(api: LocksApiClient)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
+class GamesCircuit(api: LocksApiClient)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
   override protected def initialModel: InstancesModel = InstancesModel(Seq.empty, None)
 
   override protected def actionHandler: HandlerFunction = {
     case (model: InstancesModel, action) =>
       action match {
         case LoadGames(week) =>
-          val loadInstances = Effect(api.games(week).map(response => GamesLoaded(response.games, response.getUser)))
+
+          val loadInstances = Effect(
+            for {
+              userResult <- api.user("gogo")
+              games <- api.games(week, userResult.user.id).map(response => GamesLoaded(response.games, response.locks, userResult.user))
+            } yield games)
           Some(EffectOnly(loadInstances))
 
         case LockItUp(gameId, userId, isHomeSelected) =>
@@ -35,8 +40,9 @@ class GamesCircuitTrait(api: LocksApiClient)(implicit ex: ExecutionContext) exte
 
           Some(EffectOnly(locksResult))
 
-        case GamesLoaded(games, user) =>
-          Some(ModelUpdate(model.copy(instances = games.map(g => GameProjection(g, None)), user = Some(user))))
+        case GamesLoaded(games, locks, user) =>
+          val gameProjection = games.map { g => GameProjection(g, locks.find(_.gameId == g.id)) }
+          Some(ModelUpdate(model.copy(instances = gameProjection, user = Some(user))))
 
         case LockItUpResult(lock: Lock) =>
           val updatedModel = model.instances.map {
@@ -52,7 +58,7 @@ class GamesCircuitTrait(api: LocksApiClient)(implicit ex: ExecutionContext) exte
 
 }
 
-class GamesComponent(circuit: GamesCircuitTrait) extends HtmlComponent with Layout {
+class GamesComponent(circuit: GamesCircuit) extends HtmlComponent with Layout {
 
   val games: Vars[GameProjection] = Vars.empty
   val user: Var[Option[User]] = Var.apply(None)

@@ -18,7 +18,7 @@
             <column name="_ID" type="varchar(40)">
                 <constraints nullable="false"/>
             </column>
-            <column name="_WEEK_NUMBER" type="int">
+            <column name="_WEEK" type="int">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="_HOME_TEAM_ID" type="varchar(40)">

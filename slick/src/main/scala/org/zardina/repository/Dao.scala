@@ -23,7 +23,7 @@ case class SlickGame(
   id: String,
   homeTeamId: String,
   visitorTeamId: String,
-  weekNumber: Int,
+  week: Int,
   created: Long,
   updated: Long)
 
@@ -63,13 +63,13 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
     def id: Rep[String] = column[String]("_ID")
     def homeTeamId: Rep[String] = column[String]("_HOME_TEAM_ID", O.PrimaryKey)
     def awayTeamId: Rep[String] = column[String]("_VISITOR_TEAM_ID", O.PrimaryKey)
-    def weekNumber: Rep[Int] = column[Int]("_WEEK_NUMBER", O.PrimaryKey)
+    def week: Rep[Int] = column[Int]("_WEEK", O.PrimaryKey)
     def visitorTeamPoints: Rep[Option[Double]] = column[Option[Double]]("_VISITOR_TEAM_POINTS")
     def homeTeamPoints: Rep[Option[Double]] = column[Option[Double]]("_HOME_TEAM_POINTS")
     def homeTeamWin: Rep[Option[Boolean]] = column[Option[Boolean]]("_HOME_TEAM_WIN")
     def created: Rep[Long] = column[Long]("_CREATED")
     def updated: Rep[Long] = column[Long]("_UPDATED")
-    def * = (id, homeTeamId, awayTeamId, weekNumber, created, updated) <> (SlickGame.tupled, SlickGame.unapply)
+    def * = (id, homeTeamId, awayTeamId, week, created, updated) <> (SlickGame.tupled, SlickGame.unapply)
   }
 
   class User(tag: Tag) extends Table[SlickUser](tag, "_USER") {
@@ -139,29 +139,29 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
       case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
     }
   }
-  override def createGame(homeTeam: String, visitorTeam: String, weekNumber: Int): Future[org.zardina.Game] = {
-    val slickGame = SlickGame(UUID.randomUUID().toString, homeTeam, visitorTeam, weekNumber, 1l, 1l)
-    db.run(Games += slickGame).map(_ => org.zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, weekNumber))
+  override def createGame(homeTeam: String, visitorTeam: String, week: Int): Future[org.zardina.Game] = {
+    val slickGame = SlickGame(UUID.randomUUID().toString, homeTeam, visitorTeam, week, 1l, 1l)
+    db.run(Games += slickGame).map(_ => org.zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, week))
   }
 
   override def getGame(home: String, away: String, week: Int): Future[zardina.Game] = {
-    db.run(Games.filter(_.homeTeamId === home).filter(_.awayTeamId === away).filter(_.weekNumber === week).result.headOption).flatMap {
-      case Some(p) => Future.successful(zardina.Game(p.id, p.homeTeamId, p.visitorTeamId, p.weekNumber))
+    db.run(Games.filter(_.homeTeamId === home).filter(_.awayTeamId === away).filter(_.week === week).result.headOption).flatMap {
+      case Some(p) => Future.successful(zardina.Game(p.id, p.homeTeamId, p.visitorTeamId, p.week))
       case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
     }
   }
 
   override def getGame(id: String): Future[zardina.Game] = {
     db.run(Games.filter(_.id === id).result.headOption).flatMap {
-      case Some(p) => Future.successful(zardina.Game(p.id, p.homeTeamId, p.visitorTeamId, p.weekNumber))
+      case Some(p) => Future.successful(zardina.Game(p.id, p.homeTeamId, p.visitorTeamId, p.week))
       case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
     }
   }
 
-  override def getGames(week: String): Future[Seq[zardina.Game]] = {
-    db.run(Games.filter(_.weekNumber === week.toInt).result).map {
+  override def getGames(week: Int): Future[Seq[zardina.Game]] = {
+    db.run(Games.filter(_.week === week).result).map {
       _.map { slickGame =>
-        zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, slickGame.weekNumber)
+        zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, slickGame.week)
       }
     }
   }
@@ -170,9 +170,9 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
     db.run(Locks += SlickLock(UUID.randomUUID().toString, userId, gameId, lockedTeamId, points, 1l, 2L)).map(_ => org.zardina.Lock(userId, gameId, lockedTeamId, points))
   }
 
-  override def getLocks(userId: String, weekId: String): Future[Seq[zardina.Lock]] = {
+  override def locks(userId: String, week: Int): Future[Seq[zardina.Lock]] = {
     val innerJoin = for {
-      (lock, _) <- Locks.filter(_.userId === userId) join Games.filter(_.weekNumber === weekId.toInt) on (_.gameId === _.id)
+      (lock, _) <- Locks.filter(_.userId === userId) join Games.filter(_.week === week) on (_.gameId === _.id)
     } yield lock
     db.run(innerJoin.result.map(_.map { lock => org.zardina.Lock(lock.userId, lock.gameId, lock.lockedTeam, lock.points) }))
   }
