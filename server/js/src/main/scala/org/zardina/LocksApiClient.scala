@@ -29,9 +29,8 @@ class LocksApiClient(implicit ex: ExecutionContext) {
         Future.failed(error)
     }).transform(identity[GraphQLResponse[T]], error => error match {
       case ajax: AjaxException =>
-        println(ajax)
-        val errorResponse: Json = decode[Json](ajax.xhr.responseText).toOption.flatMap(_.asObject).get("error").getOrElse(Json.fromString(error.getMessage))
-        println(errorResponse)
+        val errorResponse: Json = decode[Json](ajax.xhr.responseText).toOption.flatMap(_.asObject).get("errors").getOrElse(Json.fromString(error.getMessage))
+        println(s"ajax request failed with next response \n$errorResponse")
         new RuntimeException(errorResponse.asString.getOrElse(""))
       case error: Throwable => new RuntimeException(error.getMessage)
     })

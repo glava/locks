@@ -1,5 +1,6 @@
 package org.zardina
 import io.circe.generic.auto._
+import org.zardina.authentication.Authorized
 import sangria.macros.derive.GraphQLField
 import sangria.marshalling.circe._
 import sangria.schema.{ Argument, Schema, StringType }
@@ -43,6 +44,7 @@ object SangriaSchema {
     def team(acronym: String): Future[Team]
 
     @GraphQLField
+    @GraphQLFieldTags(Authorized)
     def locks(userId: String, week: Int): Future[Seq[Lock]]
 
   }

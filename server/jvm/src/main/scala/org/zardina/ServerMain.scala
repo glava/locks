@@ -6,11 +6,14 @@ import com.twitter.util.Await
 import io.finch.syntax.{ get, post }
 import org.zardina.graphql._
 import com.twitter.finagle.http.Status
-
 import scala.concurrent.ExecutionContext
 import io.circe._
 import io.finch.{ Endpoint, _ }
+import org.zardina.authentication.AuthMiddleware
 import org.zardina.repository._
+import sangria.execution.{ HandledException, Middleware, MiddlewareBeforeField, MiddlewareQueryContext }
+import sangria.execution.{ ExceptionHandler => EHandler, _ }
+import sangria.schema.Context
 import slick.jdbc.H2Profile
 
 object ServerMain extends App
@@ -31,7 +34,17 @@ object ServerMain extends App
     dao.createDb
   }
 
-  val executor = GraphQlQueryExecutor.executor(SangriaSchema.schema, apiContext, maxQueryDepth = 10)
+  val ErrorHandler = EHandler {
+    case (_, AuthenticationException(message)) ⇒ HandledException(message)
+    case (_, AuthorizationException(message)) ⇒ HandledException(message)
+  }
+
+  val executor = GraphQlQueryExecutor.executor(
+    SangriaSchema.schema,
+    apiContext,
+    10,
+    ErrorHandler,
+    AuthMiddleware)
 
   val index: Endpoint[Response] = get("index") {
     getResource("index.html", "text/html")

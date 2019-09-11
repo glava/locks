@@ -38,11 +38,11 @@ trait GraphQlQueryExecutor {
 object GraphQlQueryExecutor {
   val ExecutionPrefix = "graphql_execution"
 
-  def executor[C](schema: Schema[C, Unit], rootContext: C, maxQueryDepth: Int): GraphQlQueryExecutor =
-    new GraphQlQueryExecutor_(schema, rootContext, maxQueryDepth)
+  def executor[C](schema: Schema[C, Unit], rootContext: C, maxQueryDepth: Int, exceptionHandler: ExceptionHandler, middleware: Middleware[C]): GraphQlQueryExecutor =
+    new GraphQlQueryExecutor_(schema, rootContext, maxQueryDepth, exceptionHandler, middleware)
 }
 
-private final class GraphQlQueryExecutor_[C](schema: Schema[C, Unit], rootContext: C, maxQueryDepth: Int)
+private final class GraphQlQueryExecutor_[C](schema: Schema[C, Unit], rootContext: C, maxQueryDepth: Int, exceptionHandler: ExceptionHandler, middleware: Middleware[C])
   extends GraphQlQueryExecutor {
   private val resultMarshaller = CirceResultMarshaller
   private val inputMarshaller = CirceInputUnmarshaller
@@ -62,7 +62,9 @@ private final class GraphQlQueryExecutor_[C](schema: Schema[C, Unit], rootContex
       queryAst = q.document,
       userContext = rootContext,
       operationName = q.operationName,
+      middleware = List(middleware),
       variables = q.variables.getOrElse(parse("{}").right.get),
+      exceptionHandler = exceptionHandler,
       maxQueryDepth = Some(maxQueryDepth))(
         executionContext = ec,
         marshaller = resultMarshaller,
