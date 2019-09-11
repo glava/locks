@@ -1,5 +1,6 @@
 target
 .DS_store
+.DS_Store
 *.iml
 .idea
 .ensime
