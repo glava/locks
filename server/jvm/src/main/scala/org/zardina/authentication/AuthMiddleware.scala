@@ -17,7 +17,7 @@ object AuthMiddleware extends Middleware[SangriaSchema.ApiContext] with Middlewa
   override def beforeField(queryVal: QueryVal, mctx: MiddlewareQueryContext[SangriaSchema.ApiContext, _, _], ctx: Context[SangriaSchema.ApiContext, _]) = {
     val requireAuth = ctx.field.tags contains Authorized
 
-    if (requireAuth) throw new AuthorizationException("Hello!")
+    //if (requireAuth) throw new AuthorizationException("Hello!")
 
     continue
   }

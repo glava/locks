@@ -6,13 +6,15 @@ import diode.ActionResult.{ EffectOnly, ModelUpdate }
 import diode.{ Action, Circuit, Effect }
 import org.scalajs.dom.Event
 import org.scalajs.dom.html.Div
-import org.zardina.ui.HtmlComponent
 
 import scala.concurrent.{ ExecutionContext, Future }
 
 case class GamesLoaded(games: Seq[Game], locks: Seq[Lock], user: User) extends Action
+
 case class LoadGames(id: Int) extends Action
+
 case class LockItUp(gameId: String, userId: String, isHomeSelected: Boolean) extends Action
+
 case class LockItUpResult(lock: Lock) extends Action
 
 final case class InstancesModel(instances: Seq[GameProjection], user: Option[User])
@@ -58,20 +60,17 @@ class GamesCircuit(api: LocksApiClient)(implicit ex: ExecutionContext) extends C
 
 }
 
-class GamesComponent(circuit: GamesCircuit) extends HtmlComponent with Layout {
+class GamesComponent(circuit: GamesCircuit) extends Layout {
 
   val games: Vars[GameProjection] = Vars.empty
   val user: Var[Option[User]] = Var.apply(None)
 
-  override def init: Unit = {
-    circuit.subscribe(circuit.zoom(identity)) { model =>
-      games.value.clear()
-      games.value ++= model.value.instances
-      user.value = model.value.user
-    }
-
-    circuit.dispatch(LoadGames(1))
+  circuit.subscribe(circuit.zoom(identity)) { model =>
+    games.value.clear()
+    games.value ++= model.value.instances
+    user.value = model.value.user
   }
+  circuit.dispatch(LoadGames(1))
 
   def lockItUp(gameId: String, isHomeSelected: Boolean): Unit = {
     val userId = user.value.map(_.id).getOrElse("")
@@ -79,19 +78,17 @@ class GamesComponent(circuit: GamesCircuit) extends HtmlComponent with Layout {
   }
 
   @dom
-  override def element: Binding[Div] =
+  def element: Binding[Div] =
     <div id="flow">
       {
         for (gameProjection <- games) yield {
           <tr>
             <td>
-              { gameProjection.game.home }
-              <button class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, true) }>Lock away</button>
+              { gameProjection.game.home }<button class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, true) }>Lock away</button>
             </td>
             -
             <td>
-              { gameProjection.game.away }
-              <button class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, false) }>Lock home</button>
+              { gameProjection.game.away }<button class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, false) }>Lock home</button>
             </td>
             <td>
               { gameProjection.lock.toString }
@@ -99,15 +96,6 @@ class GamesComponent(circuit: GamesCircuit) extends HtmlComponent with Layout {
           </tr>
         }
       }
-    </div>
-}
-
-class EmptyComponent extends HtmlComponent with Layout {
-
-  @dom
-  override def element: Binding[Div] =
-    <div id="flow">
-      Hello
     </div>
 }
 
