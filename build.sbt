@@ -78,7 +78,8 @@ lazy val serverJS = server.js.settings(
     "io.suzaku" %%% "diode" % "1.1.3",
     "org.querki" %%% "jquery-facade" % "1.2",
     "com.thoughtworks.binding" %%% "dom" % "latest.release",
-    "com.thoughtworks.binding" %%% "futurebinding" % "latest.release"
+    "com.thoughtworks.binding" %%% "futurebinding" % "latest.release",
+    "tech.sparse" %%% "trail" % "0.2.1"
   ),
   skip in packageJSDependencies := false,
   jsDependencies += "org.webjars" % "jquery" % "2.2.1" / "jquery.js" minified "jquery.min.js",

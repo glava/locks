@@ -3,22 +3,58 @@ package org.zardina
 import com.thoughtworks.binding.Binding.Var
 import com.thoughtworks.binding.{ Binding, dom }
 import org.scalajs.dom.html.Div
-import org.scalajs.dom.window
+import org.scalajs.dom._
+import org.scalajs.dom.EventTarget
+import com.thoughtworks.binding.dom._
+import trail.Param
+import trail._
 
-import scala.concurrent.{ Await, ExecutionContext, ExecutionContextExecutor }
+import scala.concurrent.{ ExecutionContext, ExecutionContextExecutor }
 
 object LocksUI extends App with Layout {
-  implicit val excutionContext: ExecutionContextExecutor = ExecutionContext.global
+  implicit val executionContext: ExecutionContextExecutor = ExecutionContext.global
 
-  val currentView: Var[Option[Layout]] = Var(None)
-  val gamesComponent = new GamesComponent(new GamesCircuit(new LocksApiClient()))
+  val currentView: Var[Layout] = Var(EmptyLayout)
+
+  def redirect(url: String): Unit = {
+    url match {
+      case Routes.Games(key) =>
+        currentView.value = new GamesComponent(new GamesCircuit(new LocksApiClient()))
+      case _ =>
+        currentView.value = EmptyLayout
+    }
+    render(window.document.getElementById("locks-app"), appView)
+  }
 
   @dom
   def appView: Binding[Div] = {
     <div id="app-view">
-      { gamesComponent.element.bind }
+      <a href={ Routes.Games.url("gogo", "games") }>link</a>
+      { currentView.value.view.bind }
     </div>
   }
 
-  com.thoughtworks.binding.dom.render(window.document.getElementById("locks-app"), appView)
+  window.addEventListener("click", { (clickEvent: Event) =>
+    // The user may click a child within <a>, traverse parents too
+    def handle: EventTarget => Unit = {
+      case null =>
+      case a: html.Anchor if a.href.startsWith(window.location.origin.get) =>
+        if (a.onclick == null) { // We have not defined any custom behaviour
+          clickEvent.preventDefault()
+          window.history.pushState("", "", a.href)
+          redirect(a.href)
+        }
+      case n: Node => handle(n.parentNode)
+    }
+
+    handle(clickEvent.target)
+  })
+
+  render(window.document.getElementById("locks-app"), appView)
+  redirect(window.location.href)
+}
+
+object Routes {
+  val Games = Root / "index" & Param[String]("user_id") & Param[String](name = "view")
+
 }

@@ -4,13 +4,11 @@ import com.thoughtworks.binding.{ Binding, dom }
 import org.scalajs.dom.html.Div
 
 trait Layout {
-
   @dom
-  def layout(content: Div): Binding[Div] =
-    <div id="layout">
-      <div class="container">
-        { content }
-      </div>
-    </div>
+  def view: Binding[Div] = <div></div>
+}
 
+object EmptyLayout extends Layout {
+  @dom
+  override def view: Binding[Div] = <div></div>
 }

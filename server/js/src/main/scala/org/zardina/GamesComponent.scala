@@ -8,6 +8,7 @@ import org.scalajs.dom.Event
 import org.scalajs.dom.html.Div
 
 import scala.concurrent.{ ExecutionContext, Future }
+import scala.xml.Elem
 
 case class GamesLoaded(games: Seq[Game], locks: Seq[Lock], user: User) extends Action
 
@@ -78,7 +79,7 @@ class GamesComponent(circuit: GamesCircuit) extends Layout {
   }
 
   @dom
-  def element: Binding[Div] =
+  override def view =
     <div id="flow">
       {
         for (gameProjection <- games) yield {
