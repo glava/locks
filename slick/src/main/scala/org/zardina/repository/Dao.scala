@@ -123,10 +123,16 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
       .map { _ => org.zardina.User(slickUserId.id, email, nick) }
   }
 
-  override def getUser(email: String): Future[Option[zardina.User]] = {
-    db.run(Users.filter(_.email === email).result.headOption).flatMap {
+  override def getUser(id: String): Future[Option[zardina.User]] = {
+    db.run(Users.filter(_.id === id).result.headOption).flatMap {
       case Some(t) => Future.successful(Some(org.zardina.User(t.id, t.email, t.nick)))
       case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
+    }
+  }
+
+  override def getUsers(): Future[Seq[zardina.User]] = {
+    db.run(Users.result).map {
+      _.map(u => org.zardina.User(u.id, u.email, u.nick))
     }
   }
   override def createTeam(name: String, acronym: String): Future[Int] = {

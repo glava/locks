@@ -16,20 +16,22 @@ object LocksUI extends App with Layout {
 
   val currentView: Var[Layout] = Var(EmptyLayout)
 
+  val api = new LocksApiClient()
+
   def redirect(url: String): Unit = {
-    url match {
-      case Routes.Games(key) =>
-        currentView.value = new GamesComponent(new GamesCircuit(new LocksApiClient()))
+    val layout: Layout = url match {
+      case Routes.Games(userId, _) =>
+        new GamesComponent(new GamesCircuit(api, userId))
       case _ =>
-        currentView.value = EmptyLayout
+        new UsersComponent(new UsersCircuit(api))
     }
+    currentView.value = layout
     render(window.document.getElementById("locks-app"), appView)
   }
 
   @dom
   def appView: Binding[Div] = {
     <div id="app-view">
-      <a href={ Routes.Games.url("gogo", "games") }>link</a>
       { currentView.value.view.bind }
     </div>
   }
@@ -50,7 +52,6 @@ object LocksUI extends App with Layout {
     handle(clickEvent.target)
   })
 
-  render(window.document.getElementById("locks-app"), appView)
   redirect(window.location.href)
 }
 

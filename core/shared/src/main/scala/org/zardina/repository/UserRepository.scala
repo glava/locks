@@ -8,6 +8,8 @@ trait UserRepository {
 
   def createUser(nick: String, email: String, password: String): Future[User]
 
-  def getUser(email: String): Future[Option[User]]
+  def getUser(id: String): Future[Option[User]]
+
+  def getUsers(): Future[Seq[User]]
 
 }

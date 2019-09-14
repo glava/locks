@@ -38,7 +38,10 @@ object SangriaSchema {
     def games(week: Int): Future[Seq[org.zardina.Game]]
 
     @GraphQLField
-    def user(email: String): Future[Option[org.zardina.User]]
+    def user(id: String): Future[Option[org.zardina.User]]
+
+    @GraphQLField
+    def users(): Future[Seq[org.zardina.User]]
 
     @GraphQLField
     def team(acronym: String): Future[Team]

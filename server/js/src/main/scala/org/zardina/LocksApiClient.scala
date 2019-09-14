@@ -11,6 +11,7 @@ case class GraphQLResponse[T](data: T)
 case class GamesList(games: List[Game], locks: List[Lock])
 case class LockResult(createLock: Lock)
 case class UserResult(user: User)
+case class UsersResult(users: Seq[User])
 
 class LocksApiClient(implicit ex: ExecutionContext) {
 
@@ -47,15 +48,25 @@ class LocksApiClient(implicit ex: ExecutionContext) {
          |
        """.stripMargin).map(_.data)
 
-  def user(email: String): Future[UserResult] =
+  def user(id: String): Future[UserResult] =
     query[UserResult](
       s"""
          |query {
-         |   user(email:"gogo")
+         |   user(id:"${id}")
          |  { id, email, nick }
          |}
          |
        """.stripMargin).map(_.data)
+
+  def users(): Future[Seq[User]] =
+    query[UsersResult](
+      s"""
+         |query {
+         |   users
+         |  { id, email, nick }
+         |}
+         |
+       """.stripMargin).map(_.data.users)
 
   def games(week: Int, userId: String): Future[GamesList] =
     query[GamesList](

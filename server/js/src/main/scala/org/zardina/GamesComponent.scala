@@ -22,7 +22,7 @@ final case class InstancesModel(instances: Seq[GameProjection], user: Option[Use
 
 case class GameProjection(game: Game, lock: Option[Lock])
 
-class GamesCircuit(api: LocksApiClient)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
+class GamesCircuit(api: LocksApiClient, userId: String)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
   override protected def initialModel: InstancesModel = InstancesModel(Seq.empty, None)
 
   override protected def actionHandler: HandlerFunction = {
@@ -32,7 +32,7 @@ class GamesCircuit(api: LocksApiClient)(implicit ex: ExecutionContext) extends C
 
           val loadInstances = Effect(
             for {
-              userResult <- api.user("gogo")
+              userResult <- api.user(userId)
               games <- api.games(week, userResult.user.id).map(response => GamesLoaded(response.games, response.locks, userResult.user))
             } yield games)
           Some(EffectOnly(loadInstances))
