@@ -2,11 +2,12 @@ package org.zardina
 
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Response
-import com.twitter.util.Await
 import io.finch.syntax.{ get, post }
 import org.zardina.graphql._
 import com.twitter.finagle.http.Status
-import scala.concurrent.ExecutionContext
+import com.twitter.util.Await
+
+import scala.concurrent.{ ExecutionContext, Future, Await => AWW }
 import io.circe._
 import io.finch.{ Endpoint, _ }
 import org.zardina.authentication.AuthMiddleware
@@ -15,6 +16,8 @@ import sangria.execution.{ HandledException, Middleware, MiddlewareBeforeField, 
 import sangria.execution.{ ExceptionHandler => EHandler, _ }
 import sangria.schema.Context
 import slick.jdbc.H2Profile
+
+import scala.concurrent.duration.Duration
 
 object ServerMain extends App
   with StaticResourceSupport
@@ -32,6 +35,12 @@ object ServerMain extends App
     override val dao = new Dao(DataSource.h2Connection)
 
     dao.createDb
+    // load games
+    AWW.result(
+      Future.sequence(staticGameDetails.map {
+      g => dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
+    }),
+      Duration.Inf)
   }
 
   val ErrorHandler = EHandler {

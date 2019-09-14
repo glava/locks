@@ -10,7 +10,7 @@ import io.circe.parser.decode
 */
 trait StaticGamesLoader {
 
-  def staticGameDetails = decode[List[GameDetailsInstance]](json).right.get
+  def staticGameDetails: List[GameDetailsInstance] = decode[List[GameDetailsInstance]](json).right.get
 
   def json = Source.fromResource("season.json").getLines().mkString("\n")
 
