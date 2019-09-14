@@ -3,24 +3,20 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Locks</title>
 
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!--<link rel="stylesheet" href="bootswatch.lumen.min.css">-->
    <!-- <link rel="stylesheet" href="fontawesome-all.css">-->
     <!--<link rel="stylesheet" href="style.css">-->
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="bootstrap.min.js"></script>
 
     <!-- Toastr -->
     <link rel="stylesheet" type="text/css" href="toastr.min.css"/>
+    <link rel="stylesheet" type="text/css" href="locks.css"/>
     <script type="text/javascript" src="toastr.min.js"></script>
     <script type="text/javascript" src="ace.js"></script>
     <script type="text/javascript" src="theme-textmate.js"></script>
@@ -35,9 +31,38 @@
     <script src="respond.min.js"></script>
     <![endif]-->
 </head>
-<body style="padding-top: 70px;">
-    <h3> <a class="btn btn-default" href="/graphiql.html" target="_blank"><i class="fas fa-plus"></i> GraphQL Console</a> </h3>
-    <div id="locks-app"></div>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="/index">Home <span class="sr-only">(current)</span></a>
+            </li>
+        </ul>
+        <form class="form-inline my-2 my-lg-0">
+            <a class="btn btn-default" href="/graphiql.html" target="_blank"><i class="fas fa-plus"></i> GraphQL Console</a>
+        </form>
+    </div>
+</nav>
+    <h3>  </h3>
+    <div class="container">
+    <div class="row">
+        <div class="col-sm">
+        </div>
+        <div class="col-sm">
+            <div id="locks-app"></div>
+        </div>
+        <div class="col-sm">
+        </div>
+    </div>
+    </div>
+
     <script src="locks-ui.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
 </body>
 </html>

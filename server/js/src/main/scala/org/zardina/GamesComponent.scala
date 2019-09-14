@@ -85,14 +85,20 @@ class GamesComponent(circuit: GamesCircuit) extends Layout {
         for (gameProjection <- games) yield {
           <tr>
             <td>
-              { gameProjection.game.home }<button class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, true) }>Lock away</button>
+              <img class="logo" alt={ gameProjection.game.home } src={ s"https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${gameProjection.game.home.toLowerCase()}.png" }></img>
+              <button style="font-size: 24px;" class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, true) }>🔒</button>
             </td>
             -
             <td>
-              { gameProjection.game.away }<button class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, false) }>Lock home</button>
+              <img class="logo" alt={ gameProjection.game.away } src={ s"https://a1.espncdn.com/combiner/i?img=/i/teamlogos/nfl/500/scoreboard/${gameProjection.game.away.toLowerCase()}.png" }></img>
+              <button style="font-size: 24px;" class="btn btn-default" onclick={ (_: Event) => lockItUp(gameProjection.game.id, false) }>🔒</button>
             </td>
             <td>
-              { gameProjection.lock.toString }
+              <div style="font-size:16px;">
+                <button style="font-size: 24px;" class="btn btn-default">
+                  { gameProjection.lock.map(_ => "\n\uD83C\uDFC8").getOrElse("\uD83D\uDC40") }
+                </button>
+              </div>
             </td>
           </tr>
         }

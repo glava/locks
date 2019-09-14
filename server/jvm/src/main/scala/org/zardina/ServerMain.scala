@@ -38,8 +38,8 @@ object ServerMain extends App
     // load games
     AWW.result(
       Future.sequence(staticGameDetails.map {
-      g => dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
-    }),
+        g => dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
+      }),
       Duration.Inf)
   }
 
@@ -95,6 +95,7 @@ object ServerMain extends App
       httpGetResource("fontawesome-all.css", "text/css") :+:
       httpGetResource("style.css", "text/css") :+:
       httpGetResource("style.css", "text/css") :+:
+      httpGetResource("locks.css", "text/css") :+:
       httpGetResource("graphiql.html", "text/html") :+:
       httpGetResource("index.html", "text/html") :+:
       httpGetResource("graphiql.min.css", "text/css") :+:

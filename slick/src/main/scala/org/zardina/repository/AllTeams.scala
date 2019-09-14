@@ -7,7 +7,7 @@ object AllTeams {
     ("Green Bay Packers", "GB"),
     ("New York Giants", "NYG"),
     ("Detroit Lions", "DET"),
-    ("Washington Redskins", "WAS"),
+    ("Washington Redskins", "WSH"),
     ("Philadelphia Eagles", "PHI"),
     ("Pittsburgh Steelers", "PIT"),
     ("Los Angeles Rams", "LA"),
