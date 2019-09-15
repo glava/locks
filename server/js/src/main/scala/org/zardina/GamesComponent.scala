@@ -22,7 +22,7 @@ final case class InstancesModel(instances: Seq[GameProjection], user: Option[Use
 
 case class GameProjection(game: Game, lock: Option[Lock])
 
-class GamesCircuit(api: LocksApiClient, userId: String, val week: Int = 1)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
+class GamesCircuit(api: LocksApiClient, val userId: String, val week: Int = 1)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
   override protected def initialModel: InstancesModel = InstancesModel(Seq.empty, None)
 
   override protected def actionHandler: HandlerFunction = {
@@ -103,6 +103,9 @@ class GamesComponent(circuit: GamesCircuit) extends Layout {
           </tr>
         }
       }
+      <a href={ Routes.Games.url((circuit.userId, "games"), circuit.week + 1) }>
+        { s"Week ${circuit.week + 1}" }
+      </a>
     </div>
 }
 

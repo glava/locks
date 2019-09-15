@@ -38,7 +38,7 @@ object ServerMain extends App
     // load games
     AWW.result(
       Future.sequence(staticGameDetails.map {
-        g => dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
+        g => dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week, g.isoTime, g.utcTime.toString)
       }),
       Duration.Inf)
   }

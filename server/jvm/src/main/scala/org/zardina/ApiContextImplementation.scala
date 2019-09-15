@@ -36,7 +36,7 @@ trait ApiContextImplementation extends SangriaSchema.ApiContext with StaticGames
 
   def loadGames = {
     Future.sequence(staticGameDetails.map { g =>
-      dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week)
+      dao.createGame(g.homeTeamAbbr, g.visitorTeamAbbr, g.week, g.isoTime, g.utcTime.toString)
     })
   }
 

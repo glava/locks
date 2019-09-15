@@ -24,6 +24,8 @@ case class SlickGame(
   homeTeamId: String,
   visitorTeamId: String,
   week: Int,
+  isoTime: Long,
+  localTime: String,
   created: Long,
   updated: Long)
 
@@ -67,9 +69,11 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
     def visitorTeamPoints: Rep[Option[Double]] = column[Option[Double]]("_VISITOR_TEAM_POINTS")
     def homeTeamPoints: Rep[Option[Double]] = column[Option[Double]]("_HOME_TEAM_POINTS")
     def homeTeamWin: Rep[Option[Boolean]] = column[Option[Boolean]]("_HOME_TEAM_WIN")
+    def isoTime: Rep[Long] = column[Long]("_ISO_TIME")
+    def localTime: Rep[String] = column[String]("_LOCAL_TIME")
     def created: Rep[Long] = column[Long]("_CREATED")
     def updated: Rep[Long] = column[Long]("_UPDATED")
-    def * = (id, homeTeamId, awayTeamId, week, created, updated) <> (SlickGame.tupled, SlickGame.unapply)
+    def * = (id, homeTeamId, awayTeamId, week, isoTime, localTime, created, updated) <> (SlickGame.tupled, SlickGame.unapply)
   }
 
   class User(tag: Tag) extends Table[SlickUser](tag, "_USER") {
@@ -145,8 +149,8 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
       case None => Future.failed(new IllegalArgumentException("failed to find user with specified email"))
     }
   }
-  override def createGame(homeTeam: String, visitorTeam: String, week: Int): Future[org.zardina.Game] = {
-    val slickGame = SlickGame(UUID.randomUUID().toString, homeTeam, visitorTeam, week, 1l, 1l)
+  override def createGame(homeTeam: String, visitorTeam: String, week: Int, isoTime: Long, localTime: String): Future[org.zardina.Game] = {
+    val slickGame = SlickGame(UUID.randomUUID().toString, homeTeam, visitorTeam, week, isoTime, localTime, 1l, 1l)
     db.run(Games += slickGame).map(_ => org.zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, week))
   }
 
@@ -166,7 +170,7 @@ class Dao(dataSource: DataSource)(implicit val jdbcProfile: JdbcProfile, executi
 
   override def getGames(week: Int): Future[Seq[zardina.Game]] = {
     db.run(Games.filter(_.week === week).result).map {
-      _.map { slickGame =>
+      _.sortBy(_.isoTime).map { slickGame =>
         zardina.Game(slickGame.id, slickGame.homeTeamId, slickGame.visitorTeamId, slickGame.week)
       }
     }

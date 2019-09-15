@@ -6,7 +6,7 @@ import scala.concurrent.Future
 
 trait GameRepository {
 
-  def createGame(homeTeam: String, awayTeam: String, weekNumber: Int): Future[org.zardina.Game]
+  def createGame(homeTeam: String, awayTeam: String, weekNumber: Int, isoTime: Long, localTime: String): Future[org.zardina.Game]
 
   def getGames(week: Int): Future[Seq[Game]]
 

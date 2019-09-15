@@ -16,7 +16,7 @@ class LockRepositoryTest extends FlatSpec with SlickSpec with Matchers with Scal
   "Lock repository" should "be able to create a game" in {
     val team = lockRepository.createTeam("Carolina Panthers", "CAR").futureValue
     val user = lockRepository.createUser("gogo_botafogo", "gogili@golo.com", "avaala").futureValue
-    val game = lockRepository.createGame("CAR", "AR", 1).futureValue
+    val game = lockRepository.createGame("CAR", "AR", 1, 2, "2").futureValue
     lockRepository.createLock(user.id, game.id, "CAR", 10.0).futureValue
 
     lockRepository.locks(user.id, 1).futureValue.head should be(Lock(user.id, game.id, "CAR", 10.0))

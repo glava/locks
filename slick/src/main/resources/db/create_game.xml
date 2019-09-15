@@ -36,6 +36,12 @@
             <column name="_VISITOR_TEAM_POINTS" type="double">
                 <constraints nullable="true"/>
             </column>
+            <column name="_LOCAL_TIME" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="_ISO_TIME" type="bigint">
+                <constraints nullable="false"/>
+            </column>
             <column name="_CREATED" type="bigint">
                 <constraints nullable="false"/>
             </column>
