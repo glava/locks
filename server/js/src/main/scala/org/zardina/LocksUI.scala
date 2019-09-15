@@ -20,8 +20,8 @@ object LocksUI extends App with Layout {
 
   def redirect(url: String): Unit = {
     val layout: Layout = url match {
-      case Routes.Games(userId, _) =>
-        new GamesComponent(new GamesCircuit(api, userId))
+      case Routes.Games(userId, week) =>
+        new GamesComponent(new GamesCircuit(api, userId._1, week))
       case _ =>
         new UsersComponent(new UsersCircuit(api))
     }
@@ -56,6 +56,6 @@ object LocksUI extends App with Layout {
 }
 
 object Routes {
-  val Games = Root / "index" & Param[String]("user_id") & Param[String](name = "view")
+  val Games = Root / "index" & Param[String]("user_id") & Param[String](name = "view") & Param[Int]("week")
 
 }

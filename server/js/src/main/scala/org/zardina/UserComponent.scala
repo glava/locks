@@ -51,7 +51,7 @@ class UsersComponent(circuit: UsersCircuit) extends Layout {
         for (user <- users) yield {
           <tr>
             <td>
-              <a href={ Routes.Games.url(user.id, "games") }>
+              <a href={ Routes.Games.url((user.id, "games"), 1) }>
                 { user.nick }
               </a>
             </td>

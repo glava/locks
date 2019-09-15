@@ -22,7 +22,7 @@ final case class InstancesModel(instances: Seq[GameProjection], user: Option[Use
 
 case class GameProjection(game: Game, lock: Option[Lock])
 
-class GamesCircuit(api: LocksApiClient, userId: String)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
+class GamesCircuit(api: LocksApiClient, userId: String, val week: Int = 1)(implicit ex: ExecutionContext) extends Circuit[InstancesModel] {
   override protected def initialModel: InstancesModel = InstancesModel(Seq.empty, None)
 
   override protected def actionHandler: HandlerFunction = {
@@ -71,7 +71,7 @@ class GamesComponent(circuit: GamesCircuit) extends Layout {
     games.value ++= model.value.instances
     user.value = model.value.user
   }
-  circuit.dispatch(LoadGames(1))
+  circuit.dispatch(LoadGames(circuit.week))
 
   def lockItUp(gameId: String, isHomeSelected: Boolean): Unit = {
     val userId = user.value.map(_.id).getOrElse("")
